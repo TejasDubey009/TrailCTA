@@ -97,47 +97,70 @@ window.ICJ.press = [
   },
 ];
 
+/* Student projects (from icodejr.com). category: game | app | art | story */
+window.ICJ.projects = [
+  { title: 'Playful Starters', student: 'Mohammed', age: 9, tool: 'Scratch', category: 'game', image: 'https://icodejr.com/wp-content/uploads/2026/07/space-adventure-BUF_ibUf.webp', alt: 'A space shooter game with a rocket, stars and green aliens' },
+  { title: 'Music Maker App', student: 'Yuki', age: 11, tool: 'Scratch', category: 'app', image: 'https://icodejr.com/wp-content/uploads/2026/07/music-makerapp.webp', alt: 'A colourful music maker app with a piano keyboard' },
+  { title: 'Platformer Adventure', student: 'Ahmed', age: 12, tool: 'Scratch', category: 'game', image: 'https://icodejr.com/wp-content/uploads/2026/07/icodejr-projects-password-checker.webp', alt: 'Screenshot of a student platformer project' },
+  { title: 'Math Quiz Game', student: 'Omar', age: 10, tool: 'Scratch', category: 'game', image: 'https://icodejr.com/wp-content/uploads/2026/07/math-quiz-game.webp', alt: 'A maths quiz game screen' },
+  { title: 'Digital Art Gallery', student: 'Emma', age: 10, tool: 'Scratch', category: 'art', image: 'https://icodejr.com/wp-content/uploads/2026/07/3d-gallery.webp', alt: 'A digital art gallery project' },
+  { title: 'Interactive Story Game', student: 'Fatima', age: 9, tool: 'Scratch', category: 'story', image: 'https://icodejr.com/wp-content/uploads/2026/07/Interactive-Story-Game.webp', alt: 'An interactive story game scene' },
+];
+
+window.ICJ.projectCategories = { game: 'Game', app: 'App & music', art: 'Art', story: 'Story' };
+
+/* FAQ topics: the coloured pill shown on each question. */
+window.ICJ.faqTopics = {
+  start: 'Getting started',
+  class: 'In the class',
+  path: 'Learning path',
+  progress: 'Progress',
+  safety: 'Screen time & safety',
+  cost: 'Flexibility & cost',
+};
+
 /* FAQ: general questions for every family, plus questions for each age band.
+   Each entry is [question, answer, topic].
    The FAQ section shows the age band picked in the booking card (parents can switch it).
    Answers are based on icodejr.com; review them with the academic team before launch. */
 window.ICJ.faq = {
   general: [
-    ['Is the free class really free?', "Yes. The trial class is completely free and there's no obligation to enrol. We don't ask for card details."],
-    ['What happens after the class?', "You'll get feedback on how your child did, along with a recommended learning plan. Then you decide if and how you'd like to continue."],
-    ['What does my child need?', 'A laptop or tablet with a stable internet connection, and headphones if you have them. The mentor shares everything else during the class.'],
-    ['Are classes online or in person?', 'All core classes are taught live by trained instructors. We offer live online classes and, for some programs and locations in the UAE, in-person learning too.'],
-    ["What if my child doesn't enjoy the classes?", "We offer a money-back guarantee. If a program isn't the right fit, we'll work with you to fix it or refund you as per our policy."],
-    ['Are there long-term commitments?', "No. You don't commit to anything upfront. Credits never expire and can be paused anytime."],
+    ['Is the free class really free?', "Yes. The trial class is completely free and there's no obligation to enrol. We don't ask for card details.", 'cost'],
+    ['What happens after the class?', "You'll get feedback on how your child did, along with a recommended learning plan. Then you decide if and how you'd like to continue.", 'progress'],
+    ['What does my child need?', 'A laptop or tablet with a stable internet connection, and headphones if you have them. The mentor shares everything else during the class.', 'class'],
+    ['Are classes online or in person?', 'All core classes are taught live by trained instructors. We offer live online classes and, for some programs and locations in the UAE, in-person learning too.', 'class'],
+    ["What if my child doesn't enjoy the classes?", "We offer a money-back guarantee. If a program isn't the right fit, we'll work with you to fix it or refund you as per our policy.", 'cost'],
+    ['Are there long-term commitments?', "No. You don't commit to anything upfront. Credits never expire and can be paused anytime.", 'cost'],
   ],
   '5-6': [
-    ['Can a 5-year-old really learn to code?', 'Yes. At this age coding is about sequencing, cause and effect, and spotting patterns. Children start with ScratchJr, which uses picture blocks, so they can begin before they read confidently.'],
-    ['Is 50 minutes too long for a young child?', 'Classes are hands-on and paced for young children, and the mentor adjusts to how your child is doing. The free class is a good way to see how your child handles a full session.'],
-    ['Should I sit with my child?', "It helps to be nearby in the first class, for example to help with the device. You'll join at the end anyway to hear the mentor's feedback and plan."],
-    ['What will my child learn first?', 'The KG–1 path starts with ScratchJr Level 1 (sequencing and logic), then ScratchJr Level 2, AI Explorers, RoboPlay, Creative Tech Lab and Logic Games.'],
+    ['Can a 5-year-old really learn to code?', 'Yes. At this age coding is about sequencing, cause and effect, and spotting patterns. Children start with ScratchJr, which uses picture blocks, so they can begin before they read confidently.', 'start'],
+    ['Is 50 minutes too long for a young child?', 'Classes are hands-on and paced for young children, and the mentor adjusts to how your child is doing. The free class is a good way to see how your child handles a full session.', 'class'],
+    ['Should I sit with my child?', "It helps to be nearby in the first class, for example to help with the device. You'll join at the end anyway to hear the mentor's feedback and plan.", 'class'],
+    ['What will my child learn first?', 'The KG–1 path starts with ScratchJr Level 1 (sequencing and logic), then ScratchJr Level 2, AI Explorers, RoboPlay, Creative Tech Lab and Logic Games.', 'path'],
   ],
   '7-8': [
-    ['Does my child need any coding experience?', 'No. Basic reading helps because Scratch blocks have words on them, but there is no typing: children drag and snap blocks together.'],
-    ['Is this just more screen time?', 'It is active, creative screen time. Your child designs and builds games and stories, explains their thinking to a mentor, and learns to fix problems.'],
-    ['What will they build?', 'Games, animations and interactive stories in Scratch and Minecraft, plus first electronics projects with micro:bit, such as lights, buttons and sensors.'],
-    ['Coding, robotics, or both?', 'The Combined path is the most popular at this age: Scratch and AI alongside electronics and micro:bit. The mentor recommends a path after the free class.'],
+    ['Does my child need any coding experience?', 'No. Basic reading helps because Scratch blocks have words on them, but there is no typing: children drag and snap blocks together.', 'start'],
+    ['Is this just more screen time?', 'It is active, creative screen time. Your child designs and builds games and stories, explains their thinking to a mentor, and learns to fix problems.', 'safety'],
+    ['What will they build?', 'Games, animations and interactive stories in Scratch and Minecraft, plus first electronics projects with micro:bit, such as lights, buttons and sensors.', 'path'],
+    ['Coding, robotics, or both?', 'The Combined path is the most popular at this age: Scratch and AI alongside electronics and micro:bit. The mentor recommends a path after the free class.', 'path'],
   ],
   '9-10': [
-    ['Is my child ready for a real programming language?', 'Many are. The path moves from Scratch towards Python using EduBlocks, which shows the Python code behind each block, so the jump to typed code feels natural.'],
-    ['Can they build real apps?', 'Yes. With MIT App Inventor, children build working phone apps, and in Game Lab they program their own games.'],
-    ['Will they learn about AI?', 'Yes. Courses like Generative AI and AI & Smart Robots show how AI works and how to use it well, alongside Digital Citizenship for staying safe online.'],
-    ["How will I see my child's progress?", 'Parents get regular updates, project showcases and certificates, plus monthly parent meetings and a parent app.'],
+    ['Is my child ready for a real programming language?', 'Many are. The path moves from Scratch towards Python using EduBlocks, which shows the Python code behind each block, so the jump to typed code feels natural.', 'start'],
+    ['Can they build real apps?', 'Yes. With MIT App Inventor, children build working phone apps, and in Game Lab they program their own games.', 'path'],
+    ['Will they learn about AI?', 'Yes. Courses like Generative AI and AI & Smart Robots show how AI works and how to use it well, alongside Digital Citizenship for staying safe online.', 'path'],
+    ["How will I see my child's progress?", 'Parents get regular updates, project showcases and certificates, plus monthly parent meetings and a parent app.', 'progress'],
   ],
   '11-13': [
-    ['Which programming languages will my child learn?', 'Most start with Python Programming Foundations, then move on to C++, web development (HTML, CSS, then JavaScript and React) and Unity game development.'],
-    ['My child already codes. Will they repeat the basics?', 'No. The skill check in the free class places them at the right level, and the plan starts from there.'],
-    ['Can my child do robotics and hardware?', "Yes. The Robotics + AI track covers Basic Circuits, Arduino Programming, Advanced Robotics, IoT & AI and Humanoid Robotics. The mentor will tell you if a course needs any hardware."],
-    ['Will this help with computer science at school?', 'The courses build the programming and problem-solving skills used in school computing, through real projects rather than worksheets.'],
+    ['Which programming languages will my child learn?', 'Most start with Python Programming Foundations, then move on to C++, web development (HTML, CSS, then JavaScript and React) and Unity game development.', 'path'],
+    ['My child already codes. Will they repeat the basics?', 'No. The skill check in the free class places them at the right level, and the plan starts from there.', 'start'],
+    ['Can my child do robotics and hardware?', "Yes. The Robotics + AI track covers Basic Circuits, Arduino Programming, Advanced Robotics, IoT & AI and Humanoid Robotics. The mentor will tell you if a course needs any hardware.", 'path'],
+    ['Will this help with computer science at school?', 'The courses build the programming and problem-solving skills used in school computing, through real projects rather than worksheets.', 'progress'],
   ],
   '14-18': [
-    ['Is 14+ too late to start?', 'Not at all. Older students move quickly into Python, web development, C++, Unity and AI projects, at a pace set by the skill check.'],
-    ['Can this help with university applications?', 'Students build a portfolio of real projects they can show in applications, which is what our college-ready portfolio is about.'],
-    ['Are there competitions?', 'Yes. iCodeJr has run 20+ hackathons, including Code Battle, our coding competition for students across the UAE.'],
-    ['How do classes fit around exams?', 'Credits never expire and you can pause anytime, so classes can fit around exam seasons.'],
+    ['Is 14+ too late to start?', 'Not at all. Older students move quickly into Python, web development, C++, Unity and AI projects, at a pace set by the skill check.', 'start'],
+    ['Can this help with university applications?', 'Students build a portfolio of real projects they can show in applications, which is what our college-ready portfolio is about.', 'progress'],
+    ['Are there competitions?', 'Yes. iCodeJr has run 20+ hackathons, including Code Battle, our coding competition for students across the UAE.', 'progress'],
+    ['How do classes fit around exams?', 'Credits never expire and you can pause anytime, so classes can fit around exam seasons.', 'cost'],
   ],
 };
 

@@ -385,7 +385,7 @@ function renderPlan() {
   $$('.c', list).forEach((el, i) => { el.textContent = courses[i]; });
   const note = ICJ.notes[state.interest || 'unsure'].replace('{C}', courses[0]);
   $('#doc-note').textContent = `Mentor's note: ${note}`;
-  if (typeof Replay !== 'undefined') Replay.content();
+  if (typeof Filmstrip !== 'undefined') Filmstrip.content();
 }
 
 $$('input[name="plan-age"]').forEach(r => r.addEventListener('change', () => { state.planAge = r.value; renderPlan(); }));
@@ -563,16 +563,32 @@ const REPLAY_CODE = {
   python: { kind: 'code', lines: [['', 'import random'], ['', 'name = input("Your name? ")'], ['', 'secret = random.randint(1, 20)'], ['', 'guess = int(input("Guess: "))'], ['', 'while guess != secret:'], ['', '    guess = int(input("Again: "))'], ['', 'print("You got it,", name)']] },
 };
 
-const Replay = (() => {
-  const root = $('#replay');
-  const list = $('.rp-steps', root);
-  const steps = $$('.rp-step', root);
-  const screen = $('#rp-screen');
-  const segs = $$('.rp-seg i', root);
-  const ranges = steps.map(li => [+li.dataset.from, +li.dataset.to]);
-  const names = ['Say hello', 'Build something', 'Skill check', 'Your plan'];
+// Pinned sections are only as tall as their content. They stick centred on screen while the track slides,
+// so there is no empty space above or below them. Returns the sticky offset from the top of the viewport.
+function fitPin(pin, sticky, distance) {
+  pin.style.height = '';
+  const h = sticky.offsetHeight;
+  const top = Math.max(0, Math.round((innerHeight - h) / 2));
+  sticky.style.setProperty('--stick-top', `${top}px`);
+  pin.style.height = `${h + distance}px`;
+  return top;
+}
+
+// Shared pin helper: on wide, tall screens a section pins and its track slides sideways with the page scroll.
+const canPin = () => matchMedia('(min-width: 861px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)').matches;
+
+const Filmstrip = (() => {
+  const pin = $('#film-pin');
+  const vp = $('#film-viewport');
+  const track = $('#film-track');
+  const cards = $$('.film-card', track);
+  const dots = $$('.film-dots button');
+  const ranges = cards.map(c => [+c.dataset.from, +c.dataset.to]);
   let lines = [];
-  let last = -1;
+  let shift = 0;
+  let distance = 0;
+  let stickTop = 0;
+  let current = -1;
   let ticking = false;
 
   function content() {
@@ -588,88 +604,176 @@ const Replay = (() => {
     const courses = paths.package || paths[state.planTrack];
     $('#rp-plan-list').innerHTML = courses.slice(0, 3).map((c, i) => `<li${i === 0 ? ' class="first"' : ''}><span></span>${i === 0 ? '<em>Starts here</em>' : ''}</li>`).join('');
     $$('#rp-plan-list li span').forEach((el, i) => { el.textContent = courses[i]; });
-    last = -1;
-    frame();
+    update();
   }
-
-  function frame() {
-    ticking = false;
-    const box = list.getBoundingClientRect();
-    if (box.bottom < -200 || box.top > innerHeight + 200) return;
-    const win = $('.rp-window', root).getBoundingClientRect();
-    const narrow = matchMedia('(max-width: 860px)').matches;
-    // The "reading line": middle of the screen, or just below the sticky window on phones.
-    const anchor = narrow ? win.bottom + (innerHeight - win.bottom) * 0.35 : innerHeight * 0.55;
-    const p = clamp((anchor - box.top) / box.height, 0, 0.9999);
-    const idx = Math.floor(p * steps.length);
-    const local = p * steps.length - idx;
-    const [from, to] = ranges[idx];
-    const minutes = from + local * (to - from);
-    const secs = Math.floor(minutes * 60);
-    $('#rp-min').textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
-    segs.forEach((el, i) => { el.style.transform = `scaleX(${i < idx ? 1 : i > idx ? 0 : local})`; });
-    const stepProgress = i => (idx > i ? 1 : idx < i ? 0 : local);
-    const shown = Math.ceil(stepProgress(1) * lines.length);
-    lines.forEach((el, i) => el.classList.toggle('on', i < shown));
-    screen.style.setProperty('--build', stepProgress(1));
-    screen.style.setProperty('--check', stepProgress(2));
-    if (idx !== last) {
-      last = idx;
-      screen.dataset.step = idx;
-      steps.forEach((li, i) => li.classList.toggle('active', i === idx));
-      $('#rp-step-name').textContent = names[idx];
-    }
-  }
-
-  const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
-  addEventListener('scroll', schedule, { passive: true });
-  addEventListener('resize', schedule);
-  return { content, frame };
-})();
-
-/* ---------- Student projects: pinned, scroll-linked row ---------- */
-
-const ProjectRow = (() => {
-  const pin = $('#proj-pin');
-  const vp = $('#proj-viewport');
-  const track = $('#proj-track');
-  const cards = $$('.proj', track);
-  // Pin only on wide, tall-enough screens; phones and reduced-motion users swipe the row instead.
-  const canPin = () => matchMedia('(min-width: 861px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)').matches;
-  let shift = 0;
-  let ticking = false;
 
   function layout() {
     const pinned = canPin();
     pin.classList.toggle('pinned', pinned);
     track.style.transform = '';
+    pin.style.removeProperty('--fc-screen');
+    if (pinned) {
+      // Fill tall screens with a taller class window instead of empty space above and below.
+      const spare = innerHeight - $('.film-sticky', pin).offsetHeight - 48;
+      pin.style.setProperty('--fc-screen', `${clamp(262 + spare, 262, 460)}px`);
+    }
     shift = Math.max(0, track.scrollWidth - vp.clientWidth);
-    pin.style.height = pinned ? `${innerHeight + shift * 1.15}px` : '';
+    // Keep the pinned stretch short: about one screen of scrolling for all four moments.
+    distance = clamp(shift * 1.1, innerHeight * 0.8, innerHeight * 1.2);
+    pin.style.height = '';
+    if (pinned) stickTop = fitPin(pin, $('.film-sticky', pin), distance);
+    update();
+  }
+
+  // p runs 0 → 1 across the whole class. Each moment owns a quarter of it.
+  function progress() {
+    if (pin.classList.contains('pinned')) {
+      return distance > 0 ? clamp((stickTop - pin.getBoundingClientRect().top) / distance, 0, 0.9999) : 0;
+    }
+    const max = vp.scrollWidth - vp.clientWidth;
+    return max > 0 ? clamp(vp.scrollLeft / max, 0, 0.9999) : 0;
+  }
+
+  function update() {
+    ticking = false;
+    const p = progress();
+    const idx = Math.floor(p * cards.length);
+    const local = p * cards.length - idx;
+    if (pin.classList.contains('pinned')) {
+      // Centre each card in the middle of its quarter.
+      const slide = clamp((p * cards.length - 0.5) / (cards.length - 1), 0, 1);
+      track.style.transform = `translateX(${(-slide * shift).toFixed(1)}px)`;
+    }
+    const [from, to] = ranges[idx];
+    const minutes = from + local * (to - from);
+    const secs = Math.floor(minutes * 60);
+    $('#rp-min').textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+    $('#playhead').style.left = `${(minutes / 50) * 100}%`;
+    $$('.rseg i').forEach((el, i) => { el.style.transform = `scaleX(${i < idx ? 1 : i > idx ? 0 : local})`; });
+    const stage = i => (idx > i ? 1 : idx < i ? 0 : local);
+    lines.forEach((el, i) => el.classList.toggle('on', i < Math.ceil(stage(1) * lines.length) || idx > 1));
+    cards[1].style.setProperty('--build', stage(1));
+    cards[2].style.setProperty('--check', idx >= 2 ? Math.max(stage(2), idx > 2 ? 1 : 0.15) : 0);
+    if (idx !== current) {
+      current = idx;
+      cards.forEach((c, i) => c.classList.toggle('active', i === idx));
+      dots.forEach((d, i) => d.setAttribute('aria-selected', String(i === idx)));
+      $('#film-prev').disabled = idx === 0;
+      $('#film-next').disabled = idx === cards.length - 1;
+    }
+  }
+
+  function go(i) {
+    const target = clamp(i, 0, cards.length - 1);
+    if (pin.classList.contains('pinned')) {
+      const top = pin.getBoundingClientRect().top + scrollY;
+      scrollTo({ top: top - stickTop + ((target + 0.5) / cards.length) * distance, behavior: smooth });
+    } else {
+      const max = vp.scrollWidth - vp.clientWidth;
+      vp.scrollTo({ left: ((target + 0.5) / cards.length) * max, behavior: smooth });
+    }
+  }
+
+  dots.forEach(d => d.addEventListener('click', () => go(+d.dataset.go)));
+  $('#film-prev').addEventListener('click', () => go(current - 1));
+  $('#film-next').addEventListener('click', () => go(current + 1));
+  const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', schedule, { passive: true });
+  vp.addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', layout);
+  return { content, layout, update };
+})();
+
+/* ---------- Student projects: colourful wall, pinned scroll-linked row ---------- */
+
+const ProjectRow = (() => {
+  const pin = $('#proj-pin');
+  const vp = $('#proj-viewport');
+  const track = $('#proj-track');
+  let shift = 0;
+  let distance = 0;
+  let stickTop = 0;
+  let ticking = false;
+  let filter = 'all';
+
+  function render() {
+    const wanted = filter.split(' ');
+    const list = ICJ.projects.filter(p => filter === 'all' || wanted.includes(p.category));
+    track.innerHTML = list.map(p => `
+      <figure class="pcard cat-${p.category}">
+        <div class="pcard-media">
+          <img src="${p.image}" alt="" loading="lazy" width="640" height="512">
+          <span class="age-badge"><small>Age</small>${p.age}</span>
+        </div>
+        <figcaption>
+          <span class="pcard-pills"><span class="pc-pill tool">${p.tool}</span><span class="pc-pill cat">${ICJ.projectCategories[p.category]}</span></span>
+          <b></b>
+          <span class="pcard-by"><i aria-hidden="true">${p.student.charAt(0)}</i><span></span></span>
+        </figcaption>
+      </figure>`).join('');
+    $$('.pcard', track).forEach((card, i) => {
+      $('img', card).alt = list[i].alt;
+      $('b', card).textContent = list[i].title;
+      $('.pcard-by span', card).textContent = `${list[i].student}, ${list[i].age}`;
+    });
+    vp.scrollLeft = 0;
+    layout();
+  }
+
+  function stats() {
+    const ages = ICJ.projects.map(p => p.age);
+    const tools = [...new Set(ICJ.projects.map(p => p.tool))];
+    $('#proj-stats').innerHTML = [
+      `${ICJ.projects.length} featured projects`,
+      `Ages ${Math.min(...ages)}–${Math.max(...ages)}`,
+      `Built in ${tools.join(' & ')}`,
+    ].map(t => `<li>${t}</li>`).join('');
+  }
+
+  function layout() {
+    const pinned = canPin();
+    pin.classList.toggle('pinned', pinned);
+    track.style.transform = '';
+    pin.style.removeProperty('--pcard-w');
+    const first = $('.pcard', track);
+    if (pinned && first) {
+      // Bigger cards on tall screens: the image is 5:4, so each extra pixel of width adds 0.8px of height.
+      pin.style.height = '';
+      const spare = innerHeight - $('.proj-sticky', pin).offsetHeight - 48;
+      const w = first.getBoundingClientRect().width;
+      if (spare > 0) pin.style.setProperty('--pcard-w', `${Math.round(clamp(w + spare / 0.8, w, 380))}px`);
+    }
+    shift = Math.max(0, track.scrollWidth - vp.clientWidth);
+    pin.style.height = '';
+    if (!shift) pin.classList.remove('pinned');
+    distance = shift * 1.1;
+    if (pin.classList.contains('pinned')) stickTop = fitPin(pin, $('.proj-sticky', pin), distance);
     update();
   }
 
   function update() {
     ticking = false;
+    const count = $$('.pcard', track).length;
     let p;
     if (pin.classList.contains('pinned')) {
-      const total = pin.offsetHeight - innerHeight;
-      p = total > 0 ? clamp(-pin.getBoundingClientRect().top / total, 0, 1) : 0;
+      p = distance > 0 ? clamp((stickTop - pin.getBoundingClientRect().top) / distance, 0, 1) : 0;
       track.style.transform = `translateX(${(-p * shift).toFixed(1)}px)`;
     } else {
       const max = vp.scrollWidth - vp.clientWidth;
       p = max > 0 ? vp.scrollLeft / max : 0;
     }
     vp.classList.toggle('at-start', p < 0.01);
-    vp.classList.toggle('at-end', p > 0.99);
-    $('#proj-bar').style.setProperty('--p', Math.max(p, 1 / cards.length));
-    $('#proj-count').textContent = `${Math.round(p * (cards.length - 1)) + 1} / ${cards.length}`;
+    vp.classList.toggle('at-end', p > 0.99 || shift === 0);
+    $('#proj-bar').style.setProperty('--p', count ? Math.max(p, 1 / count) : 1);
+    $('#proj-count').textContent = count ? `${Math.round(p * (count - 1)) + 1} / ${count}` : '0';
   }
 
+  $$('input[name="proj-filter"]').forEach(r => r.addEventListener('change', () => { filter = r.value; render(); }));
   const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
   addEventListener('scroll', schedule, { passive: true });
   vp.addEventListener('scroll', schedule, { passive: true });
   addEventListener('resize', layout);
-  return { layout };
+  return { render, stats, layout };
 })();
 
 /* ---------- FAQ filtered by age ---------- */
@@ -678,15 +782,21 @@ let faqAge = 'all';
 
 function renderFaq() {
   const groups = [];
-  if (faqAge !== 'all') groups.push([`For ages ${ICJ.ages[faqAge].label}`, ICJ.faq[faqAge]]);
-  groups.push([faqAge === 'all' ? '' : 'For every family', ICJ.faq.general]);
+  if (faqAge !== 'all') groups.push([`For ages ${ICJ.ages[faqAge].label}`, ICJ.faq[faqAge], 'age']);
+  groups.push([faqAge === 'all' ? 'Every family asks' : 'For every family', ICJ.faq.general, 'general']);
   const list = $('#faq-list');
-  list.innerHTML = groups.map(([heading, items], g) => `${heading ? '<p class="faq-group"></p>' : ''}${items.map((_, i) => `<details${g === 0 && i === 0 ? ' open' : ''}><summary></summary><p></p></details>`).join('')}`).join('');
-  const headings = $$('.faq-group', list);
-  groups.filter(([h]) => h).forEach(([h], i) => { headings[i].textContent = h; });
+  list.dataset.age = faqAge;
+  $('.faq-sec').dataset.age = faqAge;
+  list.innerHTML = groups.map(([, items, kind], g) => `<p class="faq-group ${kind}"></p>${items.map(([, , topic], i) => `
+    <details class="faq-card"${g === 0 && i === 0 ? ' open' : ''}>
+      <summary><span class="topic t-${topic}"></span><span class="q"></span><span class="faq-x" aria-hidden="true"></span></summary>
+      <p></p>
+    </details>`).join('')}`).join('');
+  $$('.faq-group', list).forEach((el, i) => { el.textContent = groups[i][0]; });
   const all = groups.flatMap(([, items]) => items);
   $$('details', list).forEach((d, i) => {
-    $('summary', d).textContent = all[i][0];
+    $('.topic', d).textContent = ICJ.faqTopics[all[i][2]];
+    $('.q', d).textContent = all[i][0];
     $('p', d).textContent = all[i][1];
   });
   const n = displayName();
@@ -694,6 +804,12 @@ function renderFaq() {
     ? "Pick your child's age to see the questions parents of that age ask most."
     : `Showing questions for ages ${ICJ.ages[faqAge].label}${n ? `, like ${n}` : ''}, plus the ones every family asks.`;
 }
+
+// Small count badges on the age pills.
+$$('input[name="faq-age"]').forEach(r => {
+  const n = r.value === 'all' ? ICJ.faq.general.length : ICJ.faq[r.value].length;
+  r.nextElementSibling.insertAdjacentHTML('beforeend', `<em>${n}</em>`);
+});
 
 function setFaqAge(age) {
   faqAge = age;
@@ -798,6 +914,8 @@ renderPress();
 renderFaq();
 syncFooterCols();
 personalize();
-ProjectRow.layout();
-addEventListener('load', ProjectRow.layout);
+ProjectRow.stats();
+ProjectRow.render();
+Filmstrip.layout();
+addEventListener('load', () => { Filmstrip.layout(); ProjectRow.layout(); });
 showStep(1, { focus: false });

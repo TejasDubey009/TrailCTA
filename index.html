@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap">
-  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="styles.css?v=22">
 </head>
 <body>
 
@@ -49,6 +49,10 @@
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="m3 7.5 9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></symbol>
     <symbol id="i-yt" viewBox="0 0 24 24"><path fill="currentColor" d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="17" cy="9" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 14.5c2.4 0 4 1.4 4.5 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-door" viewBox="0 0 24 24"><path d="M4 21h16M7 21V4h10v17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="12.5" r="1.2" fill="currentColor"/></symbol>
   </defs>
 </svg>
 
@@ -259,25 +263,42 @@
   </div>
 </section>
 
-<section class="section class-sec" id="class" aria-labelledby="class-title">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="kicker">The free class</p>
-      <h2 id="class-title">What happens in the 50 minutes</h2>
-      <p class="sec-sub">Every minute is planned. <span class="nm-or-cap">Your child</span> spends most of it building, and you join at the end for the plan.</p>
-    </div>
-
-    <!-- Live class replay: the window on the left changes as the parent scrolls through the four moments -->
-    <div class="replay" id="replay">
-      <div class="rp-stage">
-        <div class="rp-window" aria-hidden="true">
-          <div class="rp-bar">
-            <span class="rp-live"><i></i>Live class</span>
-            <span class="rp-step-name" id="rp-step-name">Say hello</span>
-            <span class="rp-clock"><b id="rp-min">0:00</b> / 50:00</span>
+<section class="class-sec" id="class" aria-labelledby="class-title">
+  <!-- Class filmstrip: on wide screens the section pins and the four moments slide sideways with the scroll -->
+  <div class="film-pin" id="film-pin">
+    <div class="film-sticky">
+      <div class="wrap">
+        <div class="film-head">
+          <div class="sec-head">
+            <p class="kicker">The free class</p>
+            <h2 id="class-title">What happens in the 50 minutes</h2>
+            <p class="sec-sub"><span class="nm-or-cap">Your child</span> spends most of it building, and you join at the end for the plan.</p>
           </div>
-          <div class="rp-screen" id="rp-screen" data-step="0">
-            <div class="rp-scene sc-hello">
+          <ul class="fact-pills">
+            <li class="fp-time"><svg aria-hidden="true"><use href="#i-clock"/></svg>50 minutes</li>
+            <li class="fp-people"><svg aria-hidden="true"><use href="#i-users"/></svg>1 mentor, 1 child</li>
+            <li class="fp-project"><svg aria-hidden="true"><use href="#i-code"/></svg>1 real project</li>
+            <li class="fp-parent"><svg aria-hidden="true"><use href="#i-door"/></svg>Parents join the last 10 min</li>
+          </ul>
+        </div>
+
+        <div class="ruler" aria-hidden="true">
+          <div class="ruler-bar">
+            <span class="rseg" style="--g:5"><i></i></span>
+            <span class="rseg" style="--g:25"><i></i><b>Build</b></span>
+            <span class="rseg" style="--g:10"><i></i><b>Check</b></span>
+            <span class="rseg" style="--g:10"><i></i><b>Plan</b></span>
+          </div>
+          <span class="playhead" id="playhead"><b id="rp-min">0:00</b></span>
+        </div>
+
+        <div class="film-viewport" id="film-viewport">
+          <ol class="film-track" id="film-track">
+            <li class="film-card fc-hello" data-step="0" data-from="0" data-to="5">
+              <div class="fc-window" aria-hidden="true">
+                <div class="fc-bar"><span class="rp-live"><i></i>Live</span><span class="fc-label">Say hello</span></div>
+                <div class="fc-screen">
+                  <div class="rp-scene sc-hello">
               <div class="rp-tiles">
                 <div class="rp-tile mentor"><span class="rp-face"><svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12" fill="#f2c9a5"/><path d="M20 20c0-9 6-13 12-13s13 4 12 14c-3-5-8-6-12-6s-9 1-12 5z" fill="#3b2a20"/><path d="M10 60c2-13 11-20 22-20s20 7 22 20z" fill="#1b75bc"/></svg></span><span class="rp-who">Mentor</span><span class="rp-mic"></span></div>
                 <div class="rp-tile kid"><span class="rp-face rp-initial">?</span><span class="rp-who"><span class="nm-or-cap">Your child</span></span></div>
@@ -288,7 +309,20 @@
                 <p class="b3 me">Perfect. Let's build one today.</p>
               </div>
             </div>
-            <div class="rp-scene sc-build">
+                </div>
+              </div>
+              <div class="fc-text">
+                <p class="fc-time">0–5 min</p>
+                <h3>Say hello</h3>
+                <p class="fc-desc">The mentor gets to know <span class="nm-or">your child</span>: what they enjoy, from games and music to robots and stories.</p>
+                <ul class="fc-pills"><li>Ice-breaker</li><li>Interests</li><li>Meet the mentor</li></ul>
+              </div>
+            </li>
+            <li class="film-card fc-build" data-step="1" data-from="5" data-to="30">
+              <div class="fc-window" aria-hidden="true">
+                <div class="fc-bar"><span class="rp-live"><i></i>Live</span><span class="fc-label">Build something</span></div>
+                <div class="fc-screen">
+                  <div class="rp-scene sc-build">
               <div class="rp-share-h"><span class="rp-share-dot"></span>Shared screen · <span id="rp-build-title">first game</span></div>
               <div class="rp-build">
                 <div class="rp-code" id="rp-code"></div>
@@ -296,7 +330,20 @@
               </div>
               <div class="rp-pip"><span class="rp-face"><svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12" fill="#f2c9a5"/><path d="M20 20c0-9 6-13 12-13s13 4 12 14c-3-5-8-6-12-6s-9 1-12 5z" fill="#3b2a20"/><path d="M10 60c2-13 11-20 22-20s20 7 22 20z" fill="#1b75bc"/></svg></span></div>
             </div>
-            <div class="rp-scene sc-check">
+                </div>
+              </div>
+              <div class="fc-text">
+                <p class="fc-time">5–30 min</p>
+                <h3>Build something real</h3>
+                <p class="fc-desc" id="build-line">Your child codes a star-catcher game with a live score, guided step by step.</p>
+                <ul class="fc-pills"><li>Live coding</li><li>Mentor guides</li><li>Real project</li></ul>
+              </div>
+            </li>
+            <li class="film-card fc-check" data-step="2" data-from="30" data-to="40">
+              <div class="fc-window" aria-hidden="true">
+                <div class="fc-bar"><span class="rp-live"><i></i>Live</span><span class="fc-label">Skill check</span></div>
+                <div class="fc-screen">
+                  <div class="rp-scene sc-check">
               <p class="rp-card-h">Skill check · <span class="nm-or-cap">Your child</span></p>
               <ul class="rp-meters">
                 <li><span>Sequencing</span><i style="--v:.9"></i></li>
@@ -306,7 +353,20 @@
               </ul>
               <p class="rp-note">Example only. Every child's check is different.</p>
             </div>
-            <div class="rp-scene sc-plan">
+                </div>
+              </div>
+              <div class="fc-text">
+                <p class="fc-time">30–40 min</p>
+                <h3>Gentle skill check</h3>
+                <p class="fc-desc">A relaxed look at logic, problem-solving and pace, so the plan starts at the right level.</p>
+                <ul class="fc-pills"><li>Logic</li><li>Problem-solving</li><li>Pace</li></ul>
+              </div>
+            </li>
+            <li class="film-card fc-plan" data-step="3" data-from="40" data-to="50">
+              <div class="fc-window" aria-hidden="true">
+                <div class="fc-bar"><span class="rp-live"><i></i>Live</span><span class="fc-label">Your plan</span></div>
+                <div class="fc-screen">
+                  <div class="rp-scene sc-plan">
               <div class="rp-tiles three">
                 <div class="rp-tile mentor sm"><span class="rp-face"><svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12" fill="#f2c9a5"/><path d="M20 20c0-9 6-13 12-13s13 4 12 14c-3-5-8-6-12-6s-9 1-12 5z" fill="#3b2a20"/><path d="M10 60c2-13 11-20 22-20s20 7 22 20z" fill="#1b75bc"/></svg></span><span class="rp-who">Mentor</span></div>
                 <div class="rp-tile kid sm"><span class="rp-face rp-initial">?</span><span class="rp-who"><span class="nm-or-cap">Your child</span></span></div>
@@ -317,38 +377,29 @@
                 <ol id="rp-plan-list"></ol>
               </div>
             </div>
+                </div>
+              </div>
+              <div class="fc-text">
+                <p class="fc-time">40–50 min · parents join</p>
+                <h3>Your learning plan</h3>
+                <p class="fc-desc">Feedback on how it went and a recommended path. Then you decide if and how to continue.</p>
+                <ul class="fc-pills"><li>Feedback</li><li>Learning path</li><li>No obligation</li></ul>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="film-nav">
+          <button type="button" class="film-arrow" id="film-prev" aria-label="Previous moment"><svg aria-hidden="true"><use href="#i-left"/></svg></button>
+          <div class="film-dots" role="tablist" aria-label="Moments of the free class">
+            <button type="button" role="tab" data-go="0" aria-label="Say hello"></button>
+            <button type="button" role="tab" data-go="1" aria-label="Build something real"></button>
+            <button type="button" role="tab" data-go="2" aria-label="Gentle skill check"></button>
+            <button type="button" role="tab" data-go="3" aria-label="Your learning plan"></button>
           </div>
-          <div class="rp-progress">
-            <span class="rp-seg" style="--g:5"><i></i></span>
-            <span class="rp-seg" style="--g:25"><i></i></span>
-            <span class="rp-seg" style="--g:10"><i></i></span>
-            <span class="rp-seg" style="--g:10"><i></i></span>
-          </div>
+          <button type="button" class="film-arrow" id="film-next" aria-label="Next moment"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
         </div>
       </div>
-
-      <ol class="rp-steps">
-        <li class="rp-step" data-step="0" data-from="0" data-to="5">
-          <p class="m-time">0–5 min</p>
-          <h3>Say hello</h3>
-          <p>The mentor gets to know <span class="nm-or">your child</span>: what they enjoy, from games and music to robots and stories.</p>
-        </li>
-        <li class="rp-step" data-step="1" data-from="5" data-to="30">
-          <p class="m-time">5–30 min</p>
-          <h3>Build something real</h3>
-          <p id="build-line">Your child codes a star-catcher game with a live score, guided step by step.</p>
-        </li>
-        <li class="rp-step" data-step="2" data-from="30" data-to="40">
-          <p class="m-time">30–40 min</p>
-          <h3>Gentle skill check</h3>
-          <p>A relaxed look at logic, problem-solving and pace, so the plan starts at the right level.</p>
-        </li>
-        <li class="rp-step" data-step="3" data-from="40" data-to="50">
-          <p class="m-time">40–50 min · parents join</p>
-          <h3>Your learning plan</h3>
-          <p>Feedback on how it went and a recommended path. Then you decide if and how to continue.</p>
-        </li>
-    </ol>
     </div>
   </div>
 </section>
@@ -405,22 +456,27 @@
   <div class="proj-pin" id="proj-pin">
     <div class="proj-sticky">
       <div class="wrap">
-        <div class="sec-head row">
-          <div>
+        <div class="proj-head">
+          <div class="sec-head">
             <p class="kicker">Student projects</p>
             <h2 id="projects-title">Built by kids like <span class="nm-or">yours</span></h2>
+            <p class="sec-sub">Real projects from iCodeJr students. Every program is project-based, from the very first class.</p>
           </div>
-          <p class="sec-sub">Real projects from iCodeJr students. Every program is project-based, from the very first class.</p>
+          <div class="proj-side">
+            <ul class="proj-stats" id="proj-stats"></ul>
+            <div class="proj-filters" role="radiogroup" aria-label="Filter projects">
+              <label class="pf-all"><input type="radio" name="proj-filter" value="all" checked><span>All</span></label>
+              <label class="pf-game"><input type="radio" name="proj-filter" value="game"><span>Games</span></label>
+              <label class="pf-app"><input type="radio" name="proj-filter" value="app"><span>Apps &amp; music</span></label>
+              <label class="pf-art"><input type="radio" name="proj-filter" value="art story"><span>Art &amp; stories</span></label>
+            </div>
+          </div>
         </div>
+        <p class="proj-doodle" aria-hidden="true">made by real students!
+          <svg viewBox="0 0 80 40"><path d="M4 6c18 2 40 10 60 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M52 30l13 3-3-13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </p>
         <div class="proj-viewport" id="proj-viewport" tabindex="0" aria-label="Student projects">
-          <div class="proj-track" id="proj-track">
-    <figure class="proj"><img src="https://icodejr.com/wp-content/uploads/2026/07/space-adventure-BUF_ibUf.webp" alt="A space shooter game with a rocket, stars and green aliens" loading="lazy" width="640" height="512"><figcaption><b>Playful Starters</b><span>Mohammed, 9 · Scratch</span></figcaption></figure>
-    <figure class="proj"><img src="https://icodejr.com/wp-content/uploads/2026/07/music-makerapp.webp" alt="A colourful music maker app with a piano keyboard" loading="lazy" width="640" height="512"><figcaption><b>Music Maker App</b><span>Yuki, 11 · Scratch</span></figcaption></figure>
-    <figure class="proj"><img src="https://icodejr.com/wp-content/uploads/2026/07/icodejr-projects-password-checker.webp" alt="Screenshot of a student platformer project" loading="lazy" width="640" height="512"><figcaption><b>Platformer Adventure</b><span>Ahmed, 12 · Scratch</span></figcaption></figure>
-    <figure class="proj"><img src="https://icodejr.com/wp-content/uploads/2026/07/math-quiz-game.webp" alt="A maths quiz game screen" loading="lazy" width="640" height="512"><figcaption><b>Math Quiz Game</b><span>Omar, 10 · Scratch</span></figcaption></figure>
-    <figure class="proj"><img src="https://icodejr.com/wp-content/uploads/2026/07/3d-gallery.webp" alt="A digital art gallery project" loading="lazy" width="640" height="512"><figcaption><b>Digital Art Gallery</b><span>Emma, 10 · Scratch</span></figcaption></figure>
-    <figure class="proj"><img src="https://icodejr.com/wp-content/uploads/2026/07/Interactive-Story-Game.webp" alt="An interactive story game scene" loading="lazy" width="640" height="512"><figcaption><b>Interactive Story Game</b><span>Fatima, 9 · Scratch</span></figcaption></figure>
-          </div>
+          <div class="proj-track" id="proj-track" aria-live="polite"></div>
         </div>
         <div class="proj-meta">
           <span class="proj-progress"><i id="proj-bar"></i></span>
@@ -464,21 +520,24 @@
 <section class="section faq-sec" id="faq" aria-labelledby="faq-title">
   <div class="wrap faq-grid">
     <div class="faq-side">
-      <p class="kicker">Questions</p>
-      <h2 id="faq-title">Good to know</h2>
-      <p class="faq-for" id="faq-for">Pick your child's age to see the questions parents of that age ask most.</p>
-      <div class="seg-ctl faq-ages" role="radiogroup" aria-label="Show questions for age">
-        <label><input type="radio" name="faq-age" value="all" checked><span>All</span></label>
-        <label><input type="radio" name="faq-age" value="5-6"><span>5–6</span></label>
-        <label><input type="radio" name="faq-age" value="7-8"><span>7–8</span></label>
-        <label><input type="radio" name="faq-age" value="9-10"><span>9–10</span></label>
-        <label><input type="radio" name="faq-age" value="11-13"><span>11–13</span></label>
-        <label><input type="radio" name="faq-age" value="14-18"><span>14–18</span></label>
+      <div class="faq-tile">
+        <p class="kicker">Questions</p>
+        <h2 id="faq-title">Good to know</h2>
+        <p class="faq-for" id="faq-for">Pick your child's age to see the questions parents of that age ask most.</p>
+        <div class="faq-ages" role="radiogroup" aria-label="Show questions for age">
+          <label class="fa-all"><input type="radio" name="faq-age" value="all" checked><span>All</span></label>
+          <label class="fa-5"><input type="radio" name="faq-age" value="5-6"><span>5–6</span></label>
+          <label class="fa-7"><input type="radio" name="faq-age" value="7-8"><span>7–8</span></label>
+          <label class="fa-9"><input type="radio" name="faq-age" value="9-10"><span>9–10</span></label>
+          <label class="fa-11"><input type="radio" name="faq-age" value="11-13"><span>11–13</span></label>
+          <label class="fa-14"><input type="radio" name="faq-age" value="14-18"><span>14–18</span></label>
+        </div>
       </div>
-      <a class="wa-card" href="https://wa.me/971506942633" target="_blank" rel="noopener">
+      <a class="wa-card" href="https://wa.me/971506942633?text=Hi%20iCodeJr%2C%20I%20have%20a%20question%20about%20the%20free%20trial%20class" target="_blank" rel="noopener">
         <svg aria-hidden="true"><use href="#i-wa"/></svg>
-        <span><b>Ask us on WhatsApp</b><small>+971 50 694 2633</small></span>
+        <span><b>Still curious? Ask us</b><small>WhatsApp · +971 50 694 2633</small></span>
       </a>
+      <a class="btn btn-go faq-book" href="#book-card" data-scroll-book>Book the free class <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
     </div>
     <div class="faq-list" id="faq-list" aria-live="polite"></div>
   </div>
@@ -569,7 +628,7 @@
     </div>
   </div>
 
-  <p class="f-wordmark" aria-hidden="true">icodejr</p>
+  <p class="f-wordmark" aria-hidden="true">icodeJr</p>
 
   <div class="wrap f-bottom">
     <p>© 2026 iCodejr. All rights reserved.</p>
@@ -608,8 +667,8 @@
   <a class="btn btn-go" href="#book-card" data-scroll-book tabindex="-1" id="dock-btn">Book free class</a>
 </div>
 
-<script src="data.js?v=14" defer></script>
-<script src="preview.js?v=14" defer></script>
-<script src="script.js?v=14" defer></script>
+<script src="data.js?v=22" defer></script>
+<script src="preview.js?v=22" defer></script>
+<script src="script.js?v=22" defer></script>
 </body>
 </html>
