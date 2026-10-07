@@ -760,10 +760,6 @@ a.rv-name:hover { color: var(--blue); }
 .rv-when { color: var(--muted); font-size: 0.82rem; }
 .rv-text { margin: 0; color: var(--ink-2); font-size: 0.95rem; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
 .rv-attrib { margin-top: 14px; color: var(--muted); font-size: 0.8rem; }
-  content: ""; position: absolute; right: 6px; top: 50%; width: 28px; height: 28px; translate: 0 -50%; border-radius: 50%;
-  background: linear-gradient(var(--ink), var(--ink)) center / 12px 2.5px no-repeat, linear-gradient(var(--ink), var(--ink)) center / 2.5px 12px no-repeat, var(--white);
-  border: 1px solid var(--line); transition: rotate .2s ease;
-}
 
 /* Closer */
 .closer { background: var(--ink); color: #fff; padding-block: clamp(72px, 9vw, 112px) clamp(24px, 3vw, 40px); }
