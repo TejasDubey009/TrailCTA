@@ -166,3 +166,18 @@ window.ICJ.faq = {
 
 // icodejr.com does not list a separate Grades 9–12 pathway; older students use the advanced tracks.
 window.ICJ.paths['14-18'] = window.ICJ.paths['11-13'];
+
+// Google rating strip (between the FAQ and the closer). Real reviews from the iCodejr Google Business profile,
+// in the parents' own words; "…" marks where a longer review was shortened. Add more the same way.
+// url: replace with the exact Google profile link when available (Maps > Share > Copy link).
+window.ICJ.googleReviews = {
+  rating: 4.9,
+  count: 62,
+  url: 'https://www.google.com/maps/search/?api=1&query=iCodejr%2C%20Amana%20Business%20Center%2C%20Umm%20Hurrair%20Road%2C%20Dubai',
+  reviews: [
+    { name: 'Biswajyoti', text: 'My son has been learning coding for last 18 months. Incredibly grateful and satisfied with icodejr…' },
+    { name: 'Mary A.', text: 'Really professional and great with kids! … my son loved his lessons.' },
+    { name: 'Mubeen M.', text: 'iCodeJr is an ideal destination for parents looking for a coding school for their young children. …' },
+    { name: 'Abhishek M.', text: 'Great Initiative for Growing Kids to know about the Robotics with fun. …' },
+  ],
+};

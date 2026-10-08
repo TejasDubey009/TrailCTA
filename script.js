@@ -7,11 +7,6 @@ const CONFIG = {
   whatsappDisplay: '+971 50 694 2633',
   timeZone: 'Asia/Dubai',
   bookableDays: 14, // parents can book from tomorrow up to this many days ahead
-  // Google reviews: a Maps JavaScript API key with "Places API (New)" enabled, restricted to your domain,
-  // and your Google Business Place ID (find it at developers.google.com/maps/documentation/places/web-service/place-id).
-  // While either is empty the reviews section stays hidden.
-  googleMapsApiKey: '',
-  googlePlaceId: '',
 };
 
 /* Demo availability. Replace with real mentor availability from your scheduling system.
@@ -563,33 +558,66 @@ const REPLAY_CODE = {
   python: { kind: 'code', lines: [['', 'import random'], ['', 'name = input("Your name? ")'], ['', 'secret = random.randint(1, 20)'], ['', 'guess = int(input("Guess: "))'], ['', 'while guess != secret:'], ['', '    guess = int(input("Again: "))'], ['', 'print("You got it,", name)']] },
 };
 
-// Pinned sections are only as tall as their content. They stick centred on screen while the track slides,
-// so there is no empty space above or below them. Returns the sticky offset from the top of the viewport.
-function fitPin(pin, sticky, distance) {
-  pin.style.height = '';
-  const h = sticky.offsetHeight;
-  const top = Math.max(0, Math.round((innerHeight - h) / 2));
-  sticky.style.setProperty('--stick-top', `${top}px`);
-  pin.style.height = `${h + distance}px`;
-  return top;
+// Runs an auto-advancing row while it is on screen, calling tick(ms since the last frame) on each frame.
+// It never captures the page scroll: visitors scroll past freely and the row keeps its own place.
+// Reduced-motion visitors start paused, and everyone gets a pause button.
+function autoplay(row, btn, label, tick) {
+  let visible = false;
+  let paused = reduceMotion;
+  let holdUntil = 0;
+  let last = 0;
+  let raf = 0;
+  function frame(t) {
+    raf = 0;
+    if (!visible || paused) { last = 0; return; }
+    if (last && t >= holdUntil) tick(Math.min(t - last, 100));
+    last = t;
+    raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf && visible && !paused) raf = requestAnimationFrame(frame); }
+  function sync() {
+    btn.classList.toggle('paused', paused);
+    btn.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} ${label}`);
+  }
+  btn.addEventListener('click', () => { paused = !paused; sync(); kick(); });
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; kick(); }, { threshold: 0.35 }).observe(row);
+  sync();
+  return {
+    hold(ms) { holdUntil = performance.now() + ms; },
+    get paused() { return paused; },
+  };
 }
 
-// Shared pin helper: on wide, tall screens a section pins and its track slides sideways with the page scroll.
-const canPin = () => matchMedia('(min-width: 861px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)').matches;
+// Holds autoplay while someone swipes the row by hand, then calls onSettle once it comes to rest.
+function watchSwipes(row, player, onSettle) {
+  let byHand = false;
+  let timer = 0;
+  const grab = () => { byHand = true; player.hold(1500); };
+  row.addEventListener('pointerdown', grab);
+  row.addEventListener('wheel', e => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) grab(); }, { passive: true });
+  row.addEventListener('keydown', e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') grab(); });
+  row.addEventListener('scroll', () => {
+    if (byHand) player.hold(1500);
+    clearTimeout(timer);
+    timer = setTimeout(() => { if (byHand) { byHand = false; onSettle(); } }, 150);
+  }, { passive: true });
+}
 
 const Filmstrip = (() => {
-  const pin = $('#film-pin');
   const vp = $('#film-viewport');
-  const track = $('#film-track');
-  const cards = $$('.film-card', track);
+  const cards = $$('.film-card', vp);
   const dots = $$('.film-dots button');
+  const segs = $$('.rseg i');
+  const clock = $('#rp-min');
+  const head = $('#playhead');
   const ranges = cards.map(c => [+c.dataset.from, +c.dataset.to]);
+  // How long autoplay spends on each moment (ms). Building gets the longest so the code has time to type out.
+  const DWELL = [4500, 8000, 5500, 6000];
   let lines = [];
-  let shift = 0;
-  let distance = 0;
-  let stickTop = 0;
+  let idx = 0;
+  let local = reduceMotion ? 1 : 0; // how far through the current moment, 0 → 1
+  let rest = 0; // time spent on a finished moment before moving on
   let current = -1;
-  let ticking = false;
 
   function content() {
     const scene = Preview.scene || 'game';
@@ -604,97 +632,76 @@ const Filmstrip = (() => {
     const courses = paths.package || paths[state.planTrack];
     $('#rp-plan-list').innerHTML = courses.slice(0, 3).map((c, i) => `<li${i === 0 ? ' class="first"' : ''}><span></span>${i === 0 ? '<em>Starts here</em>' : ''}</li>`).join('');
     $$('#rp-plan-list li span').forEach((el, i) => { el.textContent = courses[i]; });
-    update();
+    render();
   }
 
-  function layout() {
-    const pinned = canPin();
-    pin.classList.toggle('pinned', pinned);
-    track.style.transform = '';
-    pin.style.removeProperty('--fc-screen');
-    if (pinned) {
-      // Fill tall screens with a taller class window instead of empty space above and below.
-      const spare = innerHeight - $('.film-sticky', pin).offsetHeight - 48;
-      pin.style.setProperty('--fc-screen', `${clamp(262 + spare, 262, 460)}px`);
-    }
-    shift = Math.max(0, track.scrollWidth - vp.clientWidth);
-    // Keep the pinned stretch short: about one screen of scrolling for all four moments.
-    distance = clamp(shift * 1.1, innerHeight * 0.8, innerHeight * 1.2);
-    pin.style.height = '';
-    if (pinned) stickTop = fitPin(pin, $('.film-sticky', pin), distance);
-    update();
+  // Scroll position that centres card i. The first and last cards rest against the ends.
+  function leftFor(i) {
+    const c = cards[i];
+    return clamp(c.offsetLeft - (vp.clientWidth - c.offsetWidth) / 2, 0, vp.scrollWidth - vp.clientWidth);
   }
 
-  // p runs 0 → 1 across the whole class. Each moment owns a quarter of it.
-  function progress() {
-    if (pin.classList.contains('pinned')) {
-      return distance > 0 ? clamp((stickTop - pin.getBoundingClientRect().top) / distance, 0, 0.9999) : 0;
-    }
-    const max = vp.scrollWidth - vp.clientWidth;
-    return max > 0 ? clamp(vp.scrollLeft / max, 0, 0.9999) : 0;
-  }
-
-  function update() {
-    ticking = false;
-    const p = progress();
-    const idx = Math.floor(p * cards.length);
-    const local = p * cards.length - idx;
-    if (pin.classList.contains('pinned')) {
-      // Centre each card in the middle of its quarter.
-      const slide = clamp((p * cards.length - 0.5) / (cards.length - 1), 0, 1);
-      track.style.transform = `translateX(${(-slide * shift).toFixed(1)}px)`;
-    }
+  // Draws the class clock, ruler and scenes for the current moment and how far through it we are.
+  function render() {
     const [from, to] = ranges[idx];
     const minutes = from + local * (to - from);
     const secs = Math.floor(minutes * 60);
-    $('#rp-min').textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
-    $('#playhead').style.left = `${(minutes / 50) * 100}%`;
-    $$('.rseg i').forEach((el, i) => { el.style.transform = `scaleX(${i < idx ? 1 : i > idx ? 0 : local})`; });
+    clock.textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+    head.style.left = `${(minutes / 50) * 100}%`;
+    segs.forEach((el, i) => { el.style.transform = `scaleX(${i < idx ? 1 : i > idx ? 0 : local})`; });
     const stage = i => (idx > i ? 1 : idx < i ? 0 : local);
     lines.forEach((el, i) => el.classList.toggle('on', i < Math.ceil(stage(1) * lines.length) || idx > 1));
     cards[1].style.setProperty('--build', stage(1));
     cards[2].style.setProperty('--check', idx >= 2 ? Math.max(stage(2), idx > 2 ? 1 : 0.15) : 0);
+    dots[idx].style.setProperty('--fill', local);
     if (idx !== current) {
       current = idx;
       cards.forEach((c, i) => c.classList.toggle('active', i === idx));
       dots.forEach((d, i) => d.setAttribute('aria-selected', String(i === idx)));
-      $('#film-prev').disabled = idx === 0;
-      $('#film-next').disabled = idx === cards.length - 1;
     }
   }
 
+  // Moves to a moment (wrapping round) and plays it from the start, or shows it complete while paused.
   function go(i) {
-    const target = clamp(i, 0, cards.length - 1);
-    if (pin.classList.contains('pinned')) {
-      const top = pin.getBoundingClientRect().top + scrollY;
-      scrollTo({ top: top - stickTop + ((target + 0.5) / cards.length) * distance, behavior: smooth });
-    } else {
-      const max = vp.scrollWidth - vp.clientWidth;
-      vp.scrollTo({ left: ((target + 0.5) / cards.length) * max, behavior: smooth });
-    }
+    idx = (i + cards.length) % cards.length;
+    local = player.paused ? 1 : 0;
+    rest = 0;
+    vp.scrollTo({ left: leftFor(idx), behavior: smooth });
+    render();
   }
+
+  const player = autoplay(vp, $('#film-play'), 'the class replay', dt => {
+    if (local < 1) { local = Math.min(1, local + dt / DWELL[idx]); render(); return; }
+    rest += dt;
+    // A short beat on each finished moment, and a longer one before the replay starts again.
+    if (rest >= (idx === cards.length - 1 ? 2500 : 700)) go(idx + 1);
+  });
+
+  // After a hand swipe, the moment nearest the middle becomes current and plays from its start.
+  watchSwipes(vp, player, () => {
+    const near = cards.reduce((best, _, i) => (Math.abs(leftFor(i) - vp.scrollLeft) < Math.abs(leftFor(best) - vp.scrollLeft) ? i : best), 0);
+    if (near !== idx) { idx = near; local = player.paused ? 1 : 0; rest = 0; render(); }
+    player.hold(0);
+  });
+
+  function layout() { vp.scrollTo({ left: leftFor(idx), behavior: 'instant' }); }
 
   dots.forEach(d => d.addEventListener('click', () => go(+d.dataset.go)));
-  $('#film-prev').addEventListener('click', () => go(current - 1));
-  $('#film-next').addEventListener('click', () => go(current + 1));
-  const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-  addEventListener('scroll', schedule, { passive: true });
-  vp.addEventListener('scroll', schedule, { passive: true });
+  $('#film-prev').addEventListener('click', () => go(idx - 1));
+  $('#film-next').addEventListener('click', () => go(idx + 1));
   addEventListener('resize', layout);
-  return { content, layout, update };
+  return { content, layout };
 })();
 
-/* ---------- Student projects: colourful wall, pinned scroll-linked row ---------- */
+/* ---------- Student projects: colourful wall that steps along on its own ---------- */
 
 const ProjectRow = (() => {
-  const pin = $('#proj-pin');
   const vp = $('#proj-viewport');
   const track = $('#proj-track');
-  let shift = 0;
-  let distance = 0;
-  let stickTop = 0;
-  let ticking = false;
+  const DWELL = 3200; // ms each view stays before the row moves on by one card
   let filter = 'all';
+  let wait = 0;
+  let ticking = false;
 
   function render() {
     const wanted = filter.split(' ');
@@ -717,7 +724,8 @@ const ProjectRow = (() => {
       $('.pcard-by span', card).textContent = `${list[i].student}, ${list[i].age}`;
     });
     vp.scrollLeft = 0;
-    layout();
+    wait = 0;
+    update();
   }
 
   function stats() {
@@ -730,50 +738,55 @@ const ProjectRow = (() => {
     ].map(t => `<li>${t}</li>`).join('');
   }
 
-  function layout() {
-    const pinned = canPin();
-    pin.classList.toggle('pinned', pinned);
-    track.style.transform = '';
-    pin.style.removeProperty('--pcard-w');
-    const first = $('.pcard', track);
-    if (pinned && first) {
-      // Bigger cards on tall screens: the image is 5:4, so each extra pixel of width adds 0.8px of height.
-      pin.style.height = '';
-      const spare = innerHeight - $('.proj-sticky', pin).offsetHeight - 48;
-      const w = first.getBoundingClientRect().width;
-      if (spare > 0) pin.style.setProperty('--pcard-w', `${Math.round(clamp(w + spare / 0.8, w, 380))}px`);
-    }
-    shift = Math.max(0, track.scrollWidth - vp.clientWidth);
-    pin.style.height = '';
-    if (!shift) pin.classList.remove('pinned');
-    distance = shift * 1.1;
-    if (pin.classList.contains('pinned')) stickTop = fitPin(pin, $('.proj-sticky', pin), distance);
-    update();
+  // Scroll positions where a card lines up with the left edge, ending at the far end of the row.
+  function stops() {
+    const max = vp.scrollWidth - vp.clientWidth;
+    const pad = parseFloat(getComputedStyle(vp).scrollPaddingLeft) || 0;
+    const all = $$('.pcard', track).map(c => clamp(c.offsetLeft - pad, 0, max));
+    return all.filter((x, i) => i === 0 || x - all[i - 1] > 8);
+  }
+
+  // Moves one card along, wrapping back to the start after the last view.
+  function step(dir) {
+    const s = stops();
+    wait = 0;
+    if (s.length < 2) return;
+    const here = s.reduce((best, x, i) => (Math.abs(x - vp.scrollLeft) < Math.abs(s[best] - vp.scrollLeft) ? i : best), 0);
+    vp.scrollTo({ left: s[(here + dir + s.length) % s.length], behavior: smooth });
   }
 
   function update() {
     ticking = false;
-    const count = $$('.pcard', track).length;
-    let p;
-    if (pin.classList.contains('pinned')) {
-      p = distance > 0 ? clamp((stickTop - pin.getBoundingClientRect().top) / distance, 0, 1) : 0;
-      track.style.transform = `translateX(${(-p * shift).toFixed(1)}px)`;
-    } else {
-      const max = vp.scrollWidth - vp.clientWidth;
-      p = max > 0 ? vp.scrollLeft / max : 0;
-    }
+    const cards = $$('.pcard', track);
+    const max = vp.scrollWidth - vp.clientWidth;
+    const p = max > 0 ? vp.scrollLeft / max : 0;
     vp.classList.toggle('at-start', p < 0.01);
-    vp.classList.toggle('at-end', p > 0.99 || shift === 0);
-    $('#proj-bar').style.setProperty('--p', count ? Math.max(p, 1 / count) : 1);
-    $('#proj-count').textContent = count ? `${Math.round(p * (count - 1)) + 1} / ${count}` : '0';
+    vp.classList.toggle('at-end', max <= 0 || p > 0.99);
+    // Which cards are mostly in view, e.g. "2–4 of 6"
+    const view = vp.getBoundingClientRect();
+    const seen = cards.map((c, i) => {
+      const r = c.getBoundingClientRect();
+      return Math.min(r.right, view.right) - Math.max(r.left, view.left) >= r.width * 0.6 ? i + 1 : 0;
+    }).filter(Boolean);
+    const first = seen[0] || 1;
+    const lastSeen = seen[seen.length - 1] || first;
+    $('#proj-count').textContent = `${first === lastSeen ? first : `${first}–${lastSeen}`} of ${cards.length}`;
+    $('#proj-bar').style.setProperty('--p', cards.length ? lastSeen / cards.length : 1);
+    ['#proj-prev', '#proj-next', '#proj-play'].forEach(id => { $(id).disabled = max <= 0; });
   }
 
+  const player = autoplay(vp, $('#proj-play'), 'the project slideshow', dt => {
+    wait += dt;
+    if (wait >= DWELL) step(1);
+  });
+  watchSwipes(vp, player, () => { wait = 0; player.hold(3000); });
+
+  $('#proj-prev').addEventListener('click', () => step(-1));
+  $('#proj-next').addEventListener('click', () => step(1));
   $$('input[name="proj-filter"]').forEach(r => r.addEventListener('change', () => { filter = r.value; render(); }));
-  const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-  addEventListener('scroll', schedule, { passive: true });
-  vp.addEventListener('scroll', schedule, { passive: true });
-  addEventListener('resize', layout);
-  return { render, stats, layout };
+  vp.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update);
+  return { render, stats, update };
 })();
 
 /* ---------- FAQ filtered by age ---------- */
@@ -820,80 +833,35 @@ function setFaqAge(age) {
 
 $$('input[name="faq-age"]').forEach(r => r.addEventListener('change', () => setFaqAge(r.value)));
 
-/* ---------- Google reviews ---------- */
+/* ---------- Google rating strip ---------- */
 
-const Reviews = (() => {
-  const section = $('#reviews');
-  const starRow = rating => Array.from({ length: 5 }, (_, i) => `<svg class="${rating >= i + 0.75 ? 'full' : rating >= i + 0.25 ? 'half' : 'empty'}" aria-hidden="true"><use href="#i-star"/></svg>`).join('');
-
-  function loadMapsScript(key) {
-    if (window.google?.maps?.importLibrary) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      window.__icjMapsReady = resolve;
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&loading=async&callback=__icjMapsReady`;
-      script.async = true;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  function render(place) {
-    const reviews = (place.reviews || []).filter(r => r.text);
-    if (!reviews.length) return;
-    const score = Number(place.rating || 0).toFixed(1);
-    $('#rv-score-h').textContent = score;
-    $('#rv-score').textContent = score;
-    $('#rv-stars').innerHTML = starRow(place.rating || 0);
-    $('#rv-count').textContent = (place.userRatingCount || reviews.length).toLocaleString('en');
-    $('#rv-all').href = place.googleMapsURI || '#';
-    const track = $('#rv-track');
-    track.innerHTML = reviews.map(r => `<figure class="rv-card">
-        <div class="rv-top"><img class="rv-ava" alt="" loading="lazy" referrerpolicy="no-referrer"><span><a class="rv-name" target="_blank" rel="noopener"></a><small class="rv-when"></small></span></div>
-        <span class="rv-stars-sm" role="img" aria-label="${r.rating} out of 5 stars">${starRow(r.rating)}</span>
-        <blockquote class="rv-text"></blockquote>
-      </figure>`).join('');
-    $$('.rv-card', track).forEach((card, i) => {
-      const r = reviews[i];
-      const who = r.authorAttribution || {};
-      const img = $('.rv-ava', card);
-      if (who.photoURI) img.src = who.photoURI; else img.remove();
-      const name = $('.rv-name', card);
-      name.textContent = who.displayName || 'Google user';
-      if (who.uri) name.href = who.uri; else name.removeAttribute('href');
-      $('.rv-when', card).textContent = r.relativePublishTimeDescription || '';
-      $('.rv-text', card).textContent = r.text;
-    });
-    // Repeat the cards so the scroller loops seamlessly.
-    track.append(...$$('.rv-card', track).map(c => { const copy = c.cloneNode(true); copy.setAttribute('aria-hidden', 'true'); $$('a', copy).forEach(a => { a.tabIndex = -1; }); return copy; }));
-    section.hidden = false;
-  }
-
-  async function load() {
-    if (!CONFIG.googleMapsApiKey || !CONFIG.googlePlaceId) {
-      console.info('[reviews] Add googleMapsApiKey and googlePlaceId to CONFIG in script.js to show Google reviews.');
-      return;
-    }
-    try {
-      await loadMapsScript(CONFIG.googleMapsApiKey);
-      const { Place } = await google.maps.importLibrary('places');
-      const place = new Place({ id: CONFIG.googlePlaceId });
-      await place.fetchFields({ fields: ['rating', 'userRatingCount', 'reviews', 'googleMapsURI'] });
-      render(place);
-    } catch (err) {
-      console.warn('[reviews] Could not load Google reviews.', err);
-    }
-  }
-
-  // Load only when the parent scrolls near the FAQ, so the API is called once per visit and only when needed.
-  new IntersectionObserver((entries, observer) => {
-    if (!entries[0].isIntersecting) return;
-    observer.disconnect();
-    load();
-  }, { rootMargin: '900px 0px' }).observe($('#faq'));
-
-  return { render };
-})();
+// Fixed Google score plus a slow ticker of real parent reviews (ICJ.googleReviews in data.js).
+function renderRatingStrip() {
+  const g = ICJ.googleReviews;
+  const badge = $('#rs-badge');
+  badge.href = g.url;
+  badge.setAttribute('aria-label', `Rated ${g.rating} out of 5 from ${g.count} Google reviews. Opens Google.`);
+  $('#rs-score').textContent = g.rating.toFixed(1);
+  $('#rs-count').textContent = g.count;
+  const tints = ['blue', 'yellow', 'green', 'pink', 'orange'];
+  const stars = '<svg aria-hidden="true"><use href="#i-star"/></svg>'.repeat(5);
+  const track = $('#rs-track');
+  track.innerHTML = g.reviews.map((r, i) => `
+    <li class="rs-item">
+      <span class="rs-ava is-${tints[i % tints.length]}" aria-hidden="true"></span>
+      <span class="rs-stars" role="img" aria-label="5 out of 5 stars">${stars}</span>
+      <q></q>
+      <span class="rs-who"></span>
+    </li>`).join('');
+  $$('.rs-item', track).forEach((li, i) => {
+    $('.rs-ava', li).textContent = g.reviews[i].name.charAt(0);
+    $('q', li).textContent = g.reviews[i].text;
+    $('.rs-who', li).textContent = g.reviews[i].name;
+  });
+  // A second, hidden copy makes the ticker loop seamlessly. The speed stays the same however many reviews there are.
+  track.append(...$$('.rs-item', track).map(li => { const copy = li.cloneNode(true); copy.setAttribute('aria-hidden', 'true'); return copy; }));
+  track.style.setProperty('--dur', `${Math.round(track.scrollWidth / 2 / 40)}s`);
+}
 
 /* ---------- Init ---------- */
 
@@ -912,10 +880,11 @@ Preview.update({});
 renderPlan();
 renderPress();
 renderFaq();
+renderRatingStrip();
 syncFooterCols();
 personalize();
 ProjectRow.stats();
 ProjectRow.render();
 Filmstrip.layout();
-addEventListener('load', () => { Filmstrip.layout(); ProjectRow.layout(); });
+addEventListener('load', () => { Filmstrip.layout(); ProjectRow.update(); });
 showStep(1, { focus: false });
