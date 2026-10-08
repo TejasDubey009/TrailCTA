@@ -46,6 +46,8 @@ function personalize() {
   $('#peek-title').textContent = $('#pv-title').textContent;
   $('#build-line').textContent = ICJ.builds[Preview.scene || 'game'].line.replace('{N}', n || 'Your child');
   $('#closer-cta').textContent = n ? `Book ${poss(n)} free class` : 'Book the free class';
+  if (!qfTouched.has('qf-child')) $('#qf-child').value = n;
+  if (!qfTouched.has('qf-age') && state.age) $('#qf-age').value = state.age;
   $$('.rp-initial').forEach(el => { el.textContent = n ? n.charAt(0).toUpperCase() : '?'; });
   $('#dock-btn').textContent = n && state.step > 1 ? `Continue ${poss(n)} booking` : 'Book free class';
   renderPlan();
@@ -398,28 +400,30 @@ $$('[data-scroll-book]').forEach(a => a.addEventListener('click', e => {
 }));
 
 let cardVisible = true;
+let ctaVisible = false;
 function updateDock() {
   const dock = $('#dock');
-  const show = !cardVisible && !state.done;
+  const show = !cardVisible && !ctaVisible && !state.done;
   dock.classList.toggle('show', show);
   dock.setAttribute('aria-hidden', String(!show));
   $('#dock-btn').tabIndex = show ? 0 : -1;
 }
 new IntersectionObserver(([entry]) => { cardVisible = entry.isIntersecting; updateDock(); }, { threshold: 0.1 }).observe(card);
+new IntersectionObserver(([entry]) => { ctaVisible = entry.isIntersecting; updateDock(); }, { threshold: 0.1 }).observe($('.cta-card'));
 
 /* ---------- Press cards and video player ---------- */
 
 const isEmbeddable = p => !!p.video && p.video.type !== 'link';
 
-function renderPress() {
-  const row = $('#press-row');
-  row.innerHTML = ICJ.press.map((p, i) => {
+// Video cards for the news row and the student videos row. Clicking a card opens the shared player.
+function renderVideoCards(row, list) {
+  row.innerHTML = list.map((p, i) => {
     const external = p.video?.type === 'link';
     const playable = !!p.video;
     const outletMark = (cls, alt) => (p.logo
       ? `<img class="${cls}" src="${p.logo}" alt="${alt}" loading="lazy">`
-      : `<span class="${cls} pc-wordmark"${alt ? '' : ' aria-hidden="true"'}>${p.logoText}</span>`);
-    const media = p.thumb ? `<img class="pc-thumb" src="${p.thumb}" alt="" loading="lazy">` : outletMark('pc-big-logo', '');
+      : p.logoText ? `<span class="${cls} pc-wordmark"${alt ? '' : ' aria-hidden="true"'}>${p.logoText}</span>` : '');
+    const media = p.thumb ? `<img class="pc-thumb" src="${p.thumb}" alt="" loading="lazy"${p.thumbPos ? ` style="object-position: ${p.thumbPos}"` : ''}>` : outletMark('pc-big-logo', '');
     const badge = !playable
       ? '<span class="pc-soon">Video coming soon</span>'
       : external
@@ -441,18 +445,34 @@ function renderPress() {
       : `<button type="button" class="press-card${playable ? '' : ' soon'}" data-i="${i}"${playable ? '' : ' aria-disabled="true"'}>${inner}</button>`;
   }).join('');
   $$('.press-card', row).forEach((el, i) => {
-    $('.pc-title', el).textContent = ICJ.press[i].title;
-    $('.pc-date', el).textContent = ICJ.press[i].date || ICJ.press[i].outlet;
+    $('.pc-title', el).textContent = list[i].title;
+    $('.pc-date', el).textContent = list[i].date || list[i].outlet;
   });
+  row.onclick = e => {
+    const cardEl = e.target.closest('.press-card');
+    // Link cards are plain links to the outlet's page; "coming soon" cards do nothing.
+    if (!cardEl || cardEl.tagName === 'A' || cardEl.classList.contains('soon')) return;
+    Player.open(list, +cardEl.dataset.i, cardEl);
+  };
+}
+
+function renderPress() { renderVideoCards($('#press-row'), ICJ.press); }
+
+// Student testimonial videos. The section stays hidden until ICJ.studentVideos has entries.
+function renderStories() {
+  const list = ICJ.studentVideos || [];
+  $('#stories').hidden = !list.length;
+  if (list.length) renderVideoCards($('#stories-row'), list);
 }
 
 const Player = (() => {
   const dialog = $('#player');
   const frame = $('#player-frame');
+  let items = [];
   let index = 0;
   let opener = null;
 
-  const playable = () => ICJ.press.map((p, i) => (isEmbeddable(p) ? i : -1)).filter(i => i >= 0);
+  const playable = () => items.map((p, i) => (isEmbeddable(p) ? i : -1)).filter(i => i >= 0);
 
   function embedFor(v, title) {
     const t = title.replace(/"/g, '&quot;');
@@ -476,14 +496,14 @@ const Player = (() => {
 
   function show(i) {
     index = i;
-    const p = ICJ.press[i];
+    const p = items[i];
     const list = playable();
     const embed = embedFor(p.video, `${p.outlet}: ${p.title}`);
     $('#player-logo').hidden = !p.logo;
     if (p.logo) $('#player-logo').src = p.logo;
     $('#player-outlet').textContent = [p.outlet, p.date].filter(Boolean).join(' · ');
     $('#player-title').textContent = p.title;
-    frame.classList.toggle('portrait', p.video.type === 'instagram');
+    frame.classList.toggle('portrait', p.video.type === 'instagram' || !!p.video.portrait);
     frame.innerHTML = embed.html;
     $('#player-src').href = embed.original;
     $('#player-src').textContent = p.video.type === 'instagram' ? 'Open on Instagram' : 'Open original';
@@ -497,7 +517,8 @@ const Player = (() => {
     show(list[(pos + dir + list.length) % list.length]);
   }
 
-  function open(i, from) {
+  function open(list, i, from) {
+    items = list;
     opener = from;
     show(i);
     dialog.showModal();
@@ -530,12 +551,6 @@ const Player = (() => {
   return { open, close, step };
 })();
 
-$('#press-row').addEventListener('click', e => {
-  const cardEl = e.target.closest('.press-card');
-  // Link cards are plain links to the outlet's page; "coming soon" cards do nothing.
-  if (!cardEl || cardEl.tagName === 'A' || cardEl.classList.contains('soon')) return;
-  Player.open(+cardEl.dataset.i, cardEl);
-});
 
 /* ---------- Footer ---------- */
 
@@ -842,6 +857,10 @@ function renderRatingStrip() {
   badge.href = g.url;
   badge.setAttribute('aria-label', `Rated ${g.rating} out of 5 from ${g.count} Google reviews. Opens Google.`);
   $('#rs-score').textContent = g.rating.toFixed(1);
+  // The featured review also sits in the hero booking card
+  const featured = g.reviews.find(r => r.featured) || g.reviews[0];
+  $('#bc-review-text').textContent = featured.text;
+  $('#bc-review-who').textContent = featured.name;
   $('#rs-count').textContent = g.count;
   const tints = ['blue', 'yellow', 'green', 'pink', 'orange'];
   const stars = '<svg aria-hidden="true"><use href="#i-star"/></svg>'.repeat(5);
@@ -863,6 +882,72 @@ function renderRatingStrip() {
   track.style.setProperty('--dur', `${Math.round(track.scrollWidth / 2 / 40)}s`);
 }
 
+/* ---------- Closing card: a short booking form ---------- */
+
+// Parents who reach the end of the page can book here without scrolling back up. The team follows up on WhatsApp to pick a time.
+const quickForm = $('#quick-form');
+const qfTouched = new Set();
+quickForm.addEventListener('input', e => qfTouched.add(e.target.id));
+
+quickForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('#qf-error');
+  const fail = (msg, el) => {
+    err.textContent = msg;
+    err.hidden = false;
+    if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+  };
+  err.hidden = true;
+  $$('[aria-invalid]', quickForm).forEach(el => el.removeAttribute('aria-invalid'));
+  const parent = $('#qf-parent');
+  const child = $('#qf-child');
+  const age = $('#qf-age');
+  const mobileInput = $('#qf-mobile');
+  const email = $('#qf-email');
+  if (!parent.value.trim()) return fail('Add your name so we know who to contact.', parent);
+  if (!child.value.trim()) return fail("Add your child's first name.", child);
+  if (!age.value) return fail("Choose your child's age.", age);
+  const mobile = normaliseMobile(mobileInput.value);
+  if (!mobile) return fail('Enter a UAE mobile number, like 50 123 4567.', mobileInput);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) return fail('Enter a valid email address, like name@example.com.', email);
+
+  const params = new URLSearchParams(location.search);
+  const lead = {
+    childName: child.value.trim(),
+    childAge: age.value,
+    parentName: parent.value.trim(),
+    mobile,
+    email: email.value.trim(),
+    source: 'trial-landing-page-closing-form',
+    utm: Object.fromEntries([...params].filter(([k]) => k.startsWith('utm_'))),
+    submittedAt: new Date().toISOString(),
+  };
+  const btn = $('#qf-submit');
+  const label = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = 'Booking…';
+  try {
+    if (CONFIG.bookingEndpoint) {
+      const res = await fetch(CONFIG.bookingEndpoint, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead),
+      });
+      if (!res.ok) throw new Error(`Booking endpoint returned ${res.status}`);
+    } else {
+      console.info('[demo mode] closing form request', lead);
+    }
+    $('#qf-done-title').textContent = `Thanks, ${lead.parentName.split(' ')[0]}!`;
+    $('#qf-done-text').textContent = `We'll message you on WhatsApp at ${prettyMobile(mobile)} to pick a time for ${poss(lead.childName)} free class.`;
+    quickForm.hidden = true;
+    $('#qf-done').hidden = false;
+    $('#qf-done').focus();
+  } catch (error) {
+    console.error(error);
+    fail(`We couldn’t send your booking. Check your connection and try again, or WhatsApp us on ${CONFIG.whatsappDisplay}.`);
+    btn.disabled = false;
+    btn.innerHTML = label;
+  }
+});
+
 /* ---------- Init ---------- */
 
 // Duplicate the school logos so the marquee loops seamlessly.
@@ -879,6 +964,7 @@ renderSlots();
 Preview.update({});
 renderPlan();
 renderPress();
+renderStories();
 renderFaq();
 renderRatingStrip();
 syncFooterCols();

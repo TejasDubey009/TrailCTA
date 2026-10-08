@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap">
-  <link rel="stylesheet" href="styles.css?v=38">
+  <link rel="stylesheet" href="styles.css?v=46">
 </head>
 <body>
 
@@ -72,173 +72,177 @@
 <main>
 
 <section class="hero" aria-labelledby="hero-title">
-  <div class="wrap">
+  <!-- Left: the headline with the live preview under it. Right: the booking form. -->
+  <div class="wrap hero-grid">
     <div class="hero-head">
-      <div>
-        <p class="eyebrow"><svg aria-hidden="true"><use href="#i-shield"/></svg>UAE Ministry of Education accredited</p>
-        <h1 id="hero-title">In one free class, your child builds <span class="mark">something real.</span></h1>
+      <p class="eyebrow"><svg aria-hidden="true"><use href="#i-shield"/></svg>UAE Ministry of Education accredited</p>
+      <h1 id="hero-title">In one free class, your child builds <span class="mark">something real.</span></h1>
+    </div>
+
+    <!-- Booking card: the whole registration happens here -->
+    <div class="book-card" id="book-card">
+      <div class="bc-top">
+        <p class="bc-title">Book a free class</p>
+        <ol class="progress" aria-label="Booking steps">
+          <li data-p="1" aria-current="step"><span>Child</span></li>
+          <li data-p="2"><span>Interest</span></li>
+          <li data-p="3"><span>Time</span></li>
+          <li data-p="4"><span>Contact</span></li>
+        </ol>
       </div>
-      <div class="hero-side">
-        <p class="lede">A live 1-on-1 session with an iCodeJr mentor in coding, robotics or AI, for ages 5–18. Free, with no obligation.</p>
-        <p class="rating">
-          <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
-          <span><strong>4.9/5</strong> parent rating · 5,000+ students in the UAE</span>
-        </p>
+
+      <a class="peek" href="#preview" id="peek">
+        <svg class="peek-bot" aria-hidden="true"><use href="#bot"/></svg>
+        <span><b id="peek-title">Your child's first game</b><small>See the live preview</small></span>
+        <svg class="peek-arrow" aria-hidden="true"><use href="#i-right"/></svg>
+      </a>
+
+      <form id="booking" novalidate>
+        <!-- Step 1 -->
+        <fieldset class="step" data-step="1">
+          <legend class="step-q" tabindex="-1">Who will be building?</legend>
+          <label class="field" for="child-name">
+            <span>Child's first name</span>
+            <input id="child-name" name="childName" autocomplete="off" maxlength="20" placeholder="e.g. Aarav" required>
+          </label>
+          <div class="field">
+            <span id="age-label">Age</span>
+            <div class="age-row" role="radiogroup" aria-labelledby="age-label">
+              <label><input type="radio" name="age" value="5-6"><span>5–6</span></label>
+              <label><input type="radio" name="age" value="7-8"><span>7–8</span></label>
+              <label><input type="radio" name="age" value="9-10"><span>9–10</span></label>
+              <label><input type="radio" name="age" value="11-13"><span>11–13</span></label>
+              <label><input type="radio" name="age" value="14-18"><span>14–18</span></label>
+            </div>
+          </div>
+          <p class="step-error" role="alert" hidden></p>
+          <button type="button" class="btn btn-go btn-block" data-next>Continue <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <p class="micro">Free · No card needed · Takes about a minute</p>
+        </fieldset>
+
+        <!-- Step 2 -->
+        <fieldset class="step" data-step="2" hidden>
+          <legend class="step-q" tabindex="-1">What sounds most fun to <span class="nm-or">your child</span>?</legend>
+          <div class="interest-grid">
+            <label class="tile"><input type="radio" name="interest" value="coding">
+              <span><b>Games &amp; apps</b><small>Scratch, Python, Roblox, app building</small></span></label>
+            <label class="tile"><input type="radio" name="interest" value="robotics">
+              <span><b>Robots &amp; gadgets</b><small>Micro:bit, Arduino, sensors</small></span></label>
+            <label class="tile"><input type="radio" name="interest" value="ai">
+              <span><b>Creating with AI</b><small>Chatbots, AI art and stories</small></span></label>
+            <label class="tile"><input type="radio" name="interest" value="unsure">
+              <span><b>Not sure yet</b><small>The mentor will help find out</small></span></label>
+          </div>
+          <p class="step-error" role="alert" hidden></p>
+          <div class="step-nav">
+            <button type="button" class="btn-back" data-back><svg aria-hidden="true"><use href="#i-back"/></svg>Back</button>
+            <button type="button" class="btn btn-go" data-next>Continue <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </fieldset>
+
+        <!-- Step 3 -->
+        <fieldset class="step" data-step="3" hidden>
+          <legend class="step-q" tabindex="-1">Pick a time for <span class="nm-poss">your child's</span> class</legend>
+          <div class="week">
+            <button type="button" class="icon-btn" id="week-prev" aria-label="Previous week"><svg aria-hidden="true"><use href="#i-left"/></svg></button>
+            <p id="week-label" aria-live="polite"></p>
+            <button type="button" class="icon-btn" id="week-next" aria-label="Next week"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
+          </div>
+          <div class="days" id="days" role="radiogroup" aria-label="Day"></div>
+          <div class="slots" id="slots"></div>
+          <p class="tz-note">Times are in UAE time (GST). Each class is 50 minutes.</p>
+          <p class="step-error" role="alert" hidden></p>
+          <div class="step-nav">
+            <button type="button" class="btn-back" data-back><svg aria-hidden="true"><use href="#i-back"/></svg>Back</button>
+            <button type="button" class="btn btn-go" data-next>Continue <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </fieldset>
+
+        <!-- Step 4 -->
+        <fieldset class="step" data-step="4" hidden>
+          <legend class="step-q" tabindex="-1">Where should we send the details?</legend>
+          <p class="chosen" id="chosen"></p>
+          <label class="field" for="parent-name"><span>Your name</span>
+            <input id="parent-name" name="parentName" autocomplete="name" required></label>
+          <label class="field" for="mobile"><span>Mobile (WhatsApp)</span>
+            <span class="tel"><span class="cc">+971</span><input id="mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="50 123 4567" required></span></label>
+          <label class="field" for="email"><span>Email</span>
+            <input id="email" name="email" type="email" autocomplete="email" required></label>
+          <p class="step-error" role="alert" hidden></p>
+          <div class="step-nav">
+            <button type="button" class="btn-back" data-back><svg aria-hidden="true"><use href="#i-back"/></svg>Back</button>
+            <button type="submit" class="btn btn-go" id="submit">Book <span class="nm-poss">the</span> free class</button>
+          </div>
+          <p class="micro">We only use these details to arrange the class.</p>
+        </fieldset>
+      </form>
+
+      <!-- Done -->
+      <div class="done" id="done" hidden tabindex="-1">
+        <div class="ticket">
+          <span class="ticket-check" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+          <p class="ticket-kicker">You're booked in</p>
+          <h2 class="ticket-title" id="done-title"></h2>
+          <dl class="ticket-rows">
+            <div><dt>When</dt><dd id="done-when"></dd></div>
+            <div><dt>Length</dt><dd>50 minutes, live 1-on-1</dd></div>
+            <div><dt>We'll message</dt><dd id="done-mobile"></dd></div>
+          </dl>
+          <div class="ticket-actions">
+            <a class="btn btn-go" id="gcal" href="#" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-cal"/></svg>Add to Google Calendar</a>
+            <a class="btn btn-ghost" id="ics" href="#" download="icodejr-free-class.ics">Download .ics</a>
+          </div>
+        </div>
+        <div class="before">
+          <p class="before-title">Before the class</p>
+          <ul>
+            <li><svg aria-hidden="true"><use href="#i-check"/></svg>A laptop or tablet with internet</li>
+            <li><svg aria-hidden="true"><use href="#i-check"/></svg>A quiet spot, and headphones if you have them</li>
+            <li><svg aria-hidden="true"><use href="#i-check"/></svg>Join for the last 10 minutes to hear the plan</li>
+          </ul>
+        </div>
+      </div>
+      <!-- Bottom of the card: a real parent review and what the free class includes -->
+      <div class="bc-foot">
+        <figure class="bc-review">
+          <span class="rs-stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span>
+          <blockquote><q id="bc-review-text"></q></blockquote>
+          <figcaption><svg class="rs-g" aria-hidden="true"><use href="#i-google"/></svg><span id="bc-review-who"></span> · Google review</figcaption>
+        </figure>
+      <ul class="bc-perks" aria-label="What the free class includes">
+        <li><svg aria-hidden="true"><use href="#i-clock"/></svg>50-minute live class</li>
+        <li><svg aria-hidden="true"><use href="#i-users"/></svg>1 mentor, 1 child</li>
+        <li><svg aria-hidden="true"><use href="#i-code"/></svg>Builds a real project</li>
+        <li><svg aria-hidden="true"><use href="#i-flag"/></svg>Leaves with a learning plan</li>
+      </ul>
       </div>
     </div>
 
-    <div class="hero-main">
-      <!-- Booking card: the whole registration happens here -->
-      <div class="book-card" id="book-card">
-        <div class="bc-top">
-          <p class="bc-title">Book a free class</p>
-          <ol class="progress" aria-label="Booking steps">
-            <li data-p="1" aria-current="step"><span>Child</span></li>
-            <li data-p="2"><span>Interest</span></li>
-            <li data-p="3"><span>Time</span></li>
-            <li data-p="4"><span>Contact</span></li>
-          </ol>
+    <!-- Live project preview -->
+    <div class="pv-col">
+      <p class="hint" id="hint" aria-hidden="true">Type their name and watch this change
+        <svg viewBox="0 0 120 60"><path d="M4 8c30 2 62 10 86 34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M78 40l14 4-3-14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </p>
+      <figure class="preview" id="preview">
+        <div class="pv-bar">
+          <span class="pv-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="pv-file" id="pv-file">first_game.sb3</span>
+          <span class="pv-live"><i></i>Live preview</span>
         </div>
-
-        <a class="peek" href="#preview" id="peek">
-          <svg class="peek-bot" aria-hidden="true"><use href="#bot"/></svg>
-          <span><b id="peek-title">Your child's first game</b><small>See the live preview</small></span>
-          <svg class="peek-arrow" aria-hidden="true"><use href="#i-right"/></svg>
-        </a>
-
-        <form id="booking" novalidate>
-          <!-- Step 1 -->
-          <fieldset class="step" data-step="1">
-            <legend class="step-q" tabindex="-1">Who will be building?</legend>
-            <label class="field" for="child-name">
-              <span>Child's first name</span>
-              <input id="child-name" name="childName" autocomplete="off" maxlength="20" placeholder="e.g. Aarav" required>
-            </label>
-            <div class="field">
-              <span id="age-label">Age</span>
-              <div class="age-row" role="radiogroup" aria-labelledby="age-label">
-                <label><input type="radio" name="age" value="5-6"><span>5–6</span></label>
-                <label><input type="radio" name="age" value="7-8"><span>7–8</span></label>
-                <label><input type="radio" name="age" value="9-10"><span>9–10</span></label>
-                <label><input type="radio" name="age" value="11-13"><span>11–13</span></label>
-                <label><input type="radio" name="age" value="14-18"><span>14–18</span></label>
-              </div>
-            </div>
-            <p class="step-error" role="alert" hidden></p>
-            <button type="button" class="btn btn-go btn-block" data-next>Continue <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <p class="micro">Free · No card needed · Takes about a minute</p>
-          </fieldset>
-
-          <!-- Step 2 -->
-          <fieldset class="step" data-step="2" hidden>
-            <legend class="step-q" tabindex="-1">What sounds most fun to <span class="nm-or">your child</span>?</legend>
-            <div class="interest-grid">
-              <label class="tile"><input type="radio" name="interest" value="coding">
-                <span><b>Games &amp; apps</b><small>Scratch, Python, Roblox, app building</small></span></label>
-              <label class="tile"><input type="radio" name="interest" value="robotics">
-                <span><b>Robots &amp; gadgets</b><small>Micro:bit, Arduino, sensors</small></span></label>
-              <label class="tile"><input type="radio" name="interest" value="ai">
-                <span><b>Creating with AI</b><small>Chatbots, AI art and stories</small></span></label>
-              <label class="tile"><input type="radio" name="interest" value="unsure">
-                <span><b>Not sure yet</b><small>The mentor will help find out</small></span></label>
-            </div>
-            <p class="step-error" role="alert" hidden></p>
-            <div class="step-nav">
-              <button type="button" class="btn-back" data-back><svg aria-hidden="true"><use href="#i-back"/></svg>Back</button>
-              <button type="button" class="btn btn-go" data-next>Continue <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            </div>
-          </fieldset>
-
-          <!-- Step 3 -->
-          <fieldset class="step" data-step="3" hidden>
-            <legend class="step-q" tabindex="-1">Pick a time for <span class="nm-poss">your child's</span> class</legend>
-            <div class="week">
-              <button type="button" class="icon-btn" id="week-prev" aria-label="Previous week"><svg aria-hidden="true"><use href="#i-left"/></svg></button>
-              <p id="week-label" aria-live="polite"></p>
-              <button type="button" class="icon-btn" id="week-next" aria-label="Next week"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
-            </div>
-            <div class="days" id="days" role="radiogroup" aria-label="Day"></div>
-            <div class="slots" id="slots"></div>
-            <p class="tz-note">Times are in UAE time (GST). Each class is 50 minutes.</p>
-            <p class="step-error" role="alert" hidden></p>
-            <div class="step-nav">
-              <button type="button" class="btn-back" data-back><svg aria-hidden="true"><use href="#i-back"/></svg>Back</button>
-              <button type="button" class="btn btn-go" data-next>Continue <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            </div>
-          </fieldset>
-
-          <!-- Step 4 -->
-          <fieldset class="step" data-step="4" hidden>
-            <legend class="step-q" tabindex="-1">Where should we send the details?</legend>
-            <p class="chosen" id="chosen"></p>
-            <label class="field" for="parent-name"><span>Your name</span>
-              <input id="parent-name" name="parentName" autocomplete="name" required></label>
-            <label class="field" for="mobile"><span>Mobile (WhatsApp)</span>
-              <span class="tel"><span class="cc">+971</span><input id="mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="50 123 4567" required></span></label>
-            <label class="field" for="email"><span>Email</span>
-              <input id="email" name="email" type="email" autocomplete="email" required></label>
-            <p class="step-error" role="alert" hidden></p>
-            <div class="step-nav">
-              <button type="button" class="btn-back" data-back><svg aria-hidden="true"><use href="#i-back"/></svg>Back</button>
-              <button type="submit" class="btn btn-go" id="submit">Book <span class="nm-poss">the</span> free class</button>
-            </div>
-            <p class="micro">We only use these details to arrange the class.</p>
-          </fieldset>
-        </form>
-
-        <!-- Done -->
-        <div class="done" id="done" hidden tabindex="-1">
-          <div class="ticket">
-            <span class="ticket-check" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
-            <p class="ticket-kicker">You're booked in</p>
-            <h2 class="ticket-title" id="done-title"></h2>
-            <dl class="ticket-rows">
-              <div><dt>When</dt><dd id="done-when"></dd></div>
-              <div><dt>Length</dt><dd>50 minutes, live 1-on-1</dd></div>
-              <div><dt>We'll message</dt><dd id="done-mobile"></dd></div>
-            </dl>
-            <div class="ticket-actions">
-              <a class="btn btn-go" id="gcal" href="#" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-cal"/></svg>Add to Google Calendar</a>
-              <a class="btn btn-ghost" id="ics" href="#" download="icodejr-free-class.ics">Download .ics</a>
-            </div>
-          </div>
-          <div class="before">
-            <p class="before-title">Before the class</p>
-            <ul>
-              <li><svg aria-hidden="true"><use href="#i-check"/></svg>A laptop or tablet with internet</li>
-              <li><svg aria-hidden="true"><use href="#i-check"/></svg>A quiet spot, and headphones if you have them</li>
-              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Join for the last 10 minutes to hear the plan</li>
-            </ul>
-          </div>
+        <div class="pv-head">
+          <p class="pv-title"><span id="pv-title">Your child's first game</span></p>
+          <p class="pv-meta" id="pv-meta">Scratch · ages 7–10</p>
         </div>
-      </div>
-
-      <!-- Live project preview -->
-      <div class="pv-col">
-        <p class="hint" id="hint" aria-hidden="true">Type their name and watch this change
-          <svg viewBox="0 0 120 60"><path d="M4 8c30 2 62 10 86 34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M78 40l14 4-3-14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </p>
-        <figure class="preview" id="preview">
-          <div class="pv-bar">
-            <span class="pv-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span class="pv-file" id="pv-file">first_game.sb3</span>
-            <span class="pv-live"><i></i>Live preview</span>
-          </div>
-          <div class="pv-head">
-            <p class="pv-title"><span id="pv-title">Your child's first game</span></p>
-            <p class="pv-meta" id="pv-meta">Scratch · ages 7–10</p>
-          </div>
-          <div class="pv-body" id="pv-body">
-            <div class="pv-code" id="pv-code"></div>
-            <div class="pv-stage" id="pv-stage"></div>
-          </div>
-          <div class="pv-status">
-            <span id="pv-build">Built live in the free class, with a mentor</span>
-            <span class="pv-slot" id="pv-slot" hidden><svg aria-hidden="true"><use href="#i-cal"/></svg><span></span></span>
-          </div>
-          <figcaption class="sr-only" id="pv-caption">A preview of the kind of project your child builds in the free class.</figcaption>
-        </figure>
-      </div>
+        <div class="pv-body" id="pv-body">
+          <div class="pv-code" id="pv-code"></div>
+          <div class="pv-stage" id="pv-stage"></div>
+        </div>
+        <div class="pv-status">
+          <span id="pv-build">Built live in the free class, with a mentor</span>
+          <span class="pv-slot" id="pv-slot" hidden><svg aria-hidden="true"><use href="#i-cal"/></svg><span></span></span>
+        </div>
+        <figcaption class="sr-only" id="pv-caption">A preview of the kind of project your child builds in the free class.</figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -450,7 +454,8 @@
   </div>
 </section>
 
-<section class="section projects-sec" id="projects" aria-labelledby="projects-title">
+<!-- Parked on 2026-10-08: replaced by student testimonial videos for now (remove "hidden" to bring it back) -->
+<section class="section projects-sec" id="projects" aria-labelledby="projects-title" hidden>
   <!-- Projects advance one card at a time on their own while on screen; arrows and swipe also work -->
   <div class="wrap">
     <div class="proj-head">
@@ -498,6 +503,20 @@
   <div class="shelf press-row" id="press-row" tabindex="0" aria-label="Press features, scroll sideways"></div>
 </section>
 
+<!-- Student videos, right after the news (data: ICJ.studentVideos). Hidden if the list is empty. -->
+<section class="section stories-sec" id="stories" aria-labelledby="stories-title" hidden>
+  <div class="wrap">
+    <div class="sec-head row">
+      <div>
+        <p class="kicker">Student stories</p>
+        <h2 id="stories-title">Hear it from <span class="hl">our students</span></h2>
+      </div>
+      <p class="sec-sub">Real iCodejr students on what they build and what their classes are like. Tap a video to watch.</p>
+    </div>
+  </div>
+  <div class="shelf press-row" id="stories-row" tabindex="0" aria-label="Student videos, scroll sideways"></div>
+</section>
+
 <section class="section faq-sec" id="faq" aria-labelledby="faq-title">
   <div class="wrap faq-grid">
     <div class="faq-side">
@@ -536,21 +555,47 @@
   </div>
 </section>
 
-<section class="closer" aria-labelledby="closer-title">
-  <div class="wrap closer-inner">
-    <blockquote>
-      <p>“We believe education should prepare children not just for exams, but for life.”</p>
-      <footer>Hannan Moti, Founder &amp; CEO</footer>
-    </blockquote>
-    <h2 id="closer-title">Ready when <span class="nm-or hl">your child</span> is.</h2>
-    <a class="btn btn-go btn-lg" href="#book-card" data-scroll-book><span id="closer-cta">Book the free class</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+<!-- Closing card: a short booking form, so parents who scroll to the end can book without going back up -->
+<section class="closer" id="closer" aria-labelledby="closer-title">
+  <div class="wrap">
+    <div class="cta-card">
+      <div class="cta-copy">
+        <h2 id="closer-title">Ready when <span class="nm-or">your child</span> is.</h2>
+        <p class="cta-sub">Live 1-on-1 classes for ages 5–18 with expert mentors, on a learning path made for <span class="nm-or">your child</span>. The first class is free, with no obligation.</p>
+        <ul class="cta-chips" aria-label="Programs"><li>Scratch</li><li>Python</li><li>Roblox</li><li>Minecraft</li><li>Robotics</li><li>Generative AI</li><li>Web Dev</li></ul>
+        <blockquote class="cta-quote">
+          <p>“We believe education should prepare children not just for exams, but for life.”</p>
+          <footer>Hannan Moti, Founder &amp; CEO</footer>
+        </blockquote>
+      </div>
+      <div class="cta-form-wrap">
+        <form class="quick-form" id="quick-form" novalidate>
+          <p class="bc-title">Book a free class</p>
+          <div class="qf-grid">
+            <label class="field" for="qf-parent"><span>Your name</span><input id="qf-parent" autocomplete="name" required></label>
+            <label class="field" for="qf-child"><span>Child's first name</span><input id="qf-child" autocomplete="off" required></label>
+            <label class="field" for="qf-age"><span>Child's age</span><select id="qf-age" required><option value="">Choose</option><option value="5-6">5–6</option><option value="7-8">7–8</option><option value="9-10">9–10</option><option value="11-13">11–13</option><option value="14-18">14–18</option></select></label>
+            <label class="field" for="qf-mobile"><span>Mobile (WhatsApp)</span><span class="tel"><span class="cc">+971</span><input id="qf-mobile" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="50 123 4567" required></span></label>
+            <label class="field qf-wide" for="qf-email"><span>Email</span><input id="qf-email" type="email" autocomplete="email" required></label>
+          </div>
+          <p class="step-error" id="qf-error" role="alert" hidden></p>
+          <button type="submit" class="btn btn-go btn-block" id="qf-submit"><span id="closer-cta">Book the free class</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <p class="micro">Free · No card needed · We'll WhatsApp you to pick a time</p>
+        </form>
+        <div class="qf-done" id="qf-done" tabindex="-1" hidden>
+          <svg aria-hidden="true"><use href="#i-check"/></svg>
+          <h3 id="qf-done-title">Thanks!</h3>
+          <p id="qf-done-text"></p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 </main>
 
 <footer class="footer">
-  <!-- The navy closer flows into the footer through a wave; the robot and subject icons ride it -->
+  <!-- The navy band behind the closing card flows into the footer through a wave; the robot and subject icons ride it -->
   <div class="f-wave" aria-hidden="true">
     <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none"><path fill="#0f1f3d" d="M0 0h1440v70c-60 0-120 26-240 26s-180-26-240-26-120 26-240 26-180-26-240-26-120 26-240 26S60 70 0 70z"/></svg>
     <span class="rider r-block" style="--x:16.67%;--y:80%"><svg viewBox="0 0 64 40"><path fill="#facc15" d="M6 4h12l4 4h10l4-4h22a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H36l-4 4H22l-4-4H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/><path d="M14 16l8 4-8 4z" fill="#18a058"/></svg></span>
@@ -620,7 +665,7 @@
     </div>
   </div>
 
-  <p class="f-wordmark" aria-hidden="true">icodeJr</p>
+  <p class="f-wordmark" aria-hidden="true">iCodejr</p>
 
   <div class="wrap f-bottom">
     <p>© 2026 iCodejr. All rights reserved.</p>
@@ -659,8 +704,8 @@
   <a class="btn btn-go" href="#book-card" data-scroll-book tabindex="-1" id="dock-btn">Book free class</a>
 </div>
 
-<script src="data.js?v=38" defer></script>
-<script src="preview.js?v=38" defer></script>
-<script src="script.js?v=38" defer></script>
+<script src="data.js?v=46" defer></script>
+<script src="preview.js?v=46" defer></script>
+<script src="script.js?v=46" defer></script>
 </body>
 </html>

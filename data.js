@@ -176,8 +176,38 @@ window.ICJ.googleReviews = {
   url: 'https://www.google.com/maps/search/?api=1&query=iCodejr%2C%20Amana%20Business%20Center%2C%20Umm%20Hurrair%20Road%2C%20Dubai',
   reviews: [
     { name: 'Biswajyoti', text: 'My son has been learning coding for last 18 months. Incredibly grateful and satisfied with icodejr…' },
-    { name: 'Mary A.', text: 'Really professional and great with kids! … my son loved his lessons.' },
+    { name: 'Mary A.', text: 'Really professional and great with kids! … my son loved his lessons.', featured: true }, // also shown in the hero booking card
     { name: 'Mubeen M.', text: 'iCodeJr is an ideal destination for parents looking for a coding school for their young children. …' },
     { name: 'Abhishek M.', text: 'Great Initiative for Growing Kids to know about the Robotics with fun. …' },
   ],
 };
+
+// Student testimonial videos (section after "What happens in the 50 minutes"). The section stays hidden while this is empty.
+// Each entry uses the same video formats as ICJ.press, for example:
+//   { title: 'I built my own Roblox obby', outlet: 'Aarav, age 10', duration: '1:12',
+//     thumb: 'https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg', video: { type: 'youtube', id: 'VIDEO_ID' } }
+// video.type can be 'youtube', 'vimeo', 'mp4' (with src) or 'instagram' (with url).
+window.ICJ.studentVideos = [
+  {
+    title: 'Student testimonial: Zyann A.',
+    outlet: 'Student · Dubai',
+    duration: '0:20',
+    thumb: 'https://i.ytimg.com/vi/yEByVSh62oU/oardefault.jpg', // vertical video, so use the portrait frame and crop to his face
+    thumbPos: '50% 40%',
+    video: { type: 'youtube', id: 'yEByVSh62oU', portrait: true },
+  },
+  {
+    title: "Jigar's Python Smart Study Planner",
+    outlet: 'Student project showcase',
+    duration: '2:24',
+    thumb: 'https://i.ytimg.com/vi/VlOezhrC4Ew/maxresdefault.jpg',
+    video: { type: 'youtube', id: 'VlOezhrC4Ew' },
+  },
+  {
+    title: "Vansh's Arduino Reaction Timer",
+    outlet: 'Student project showcase',
+    duration: '1:04',
+    thumb: 'https://i.ytimg.com/vi/VcSRQY6ojdQ/maxresdefault.jpg',
+    video: { type: 'youtube', id: 'VcSRQY6ojdQ' },
+  },
+];
