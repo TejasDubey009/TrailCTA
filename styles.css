@@ -802,6 +802,9 @@ button, input, select { font: inherit; color: inherit; }
 .closer .btn-go { box-shadow: 0 4px 0 #0a3f69; }
 
 /* ---------- Press ---------- */
+/* A white band, so the news section stands apart. Its own edges separate it, so the hairlines above and below it are dropped. */
+.press-sec { background: var(--white); }
+.press-sec::before, .press-sec + .section::before { display: none; }
 /* Three cards fill the content width; narrower screens swipe */
 .press-row { grid-auto-columns: max(240px, calc((100% - 40px) / 3)); }
 .press-card {
