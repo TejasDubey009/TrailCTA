@@ -1,4 +1,4 @@
-/* iCodeJr free-trial page: booking flow, personalisation and learning plan. */
+/* iCodejr free-trial page: booking flow, personalisation and learning plan. */
 
 const CONFIG = {
   // Where booking requests are sent as JSON (a CRM webhook, Zapier, HubSpot form endpoint, etc.).
@@ -261,11 +261,11 @@ function utcStamp(iso, time, addMin = 0) {
 function calendarLinks(n) {
   const start = utcStamp(state.day, state.time);
   const end = utcStamp(state.day, state.time, 50);
-  const title = `iCodeJr free class for ${n}`;
-  const details = `Live 1-on-1 trial class with an iCodeJr mentor. Questions? WhatsApp ${CONFIG.whatsappDisplay}`;
+  const title = `iCodejr free class for ${n}`;
+  const details = `Live 1-on-1 trial class with an iCodejr mentor. Questions? WhatsApp ${CONFIG.whatsappDisplay}`;
   const g = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}`;
   const ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//iCodeJr//Free class//EN', 'BEGIN:VEVENT',
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//iCodejr//Free class//EN', 'BEGIN:VEVENT',
     `UID:${start}-${Math.random().toString(36).slice(2)}@icodejr.com`, `DTSTAMP:${utcStamp(new Date().toISOString().slice(0, 10), '04:00')}`,
     `DTSTART:${start}`, `DTEND:${end}`, `SUMMARY:${title}`, `DESCRIPTION:${details}`,
     'END:VEVENT', 'END:VCALENDAR',
@@ -855,13 +855,12 @@ function renderRatingStrip() {
   const g = ICJ.googleReviews;
   const badge = $('#rs-badge');
   badge.href = g.url;
-  badge.setAttribute('aria-label', `Rated ${g.rating} out of 5 from ${g.count} Google reviews. Opens Google.`);
+  badge.setAttribute('aria-label', `Rated ${g.rating} out of 5 on Google reviews. Opens Google.`);
   $('#rs-score').textContent = g.rating.toFixed(1);
   // The featured review also sits in the hero booking card
   const featured = g.reviews.find(r => r.featured) || g.reviews[0];
   $('#bc-review-text').textContent = featured.text;
   $('#bc-review-who').textContent = featured.name;
-  $('#rs-count').textContent = g.count;
   const tints = ['blue', 'yellow', 'green', 'pink', 'orange'];
   const stars = '<svg aria-hidden="true"><use href="#i-star"/></svg>'.repeat(5);
   const track = $('#rs-track');

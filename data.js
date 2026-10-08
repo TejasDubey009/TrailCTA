@@ -56,7 +56,7 @@ window.ICJ = {
   },
 };
 
-/* Press features for the "iCodeJr in the news" section.
+/* Press features for the "iCodejr in the news" section.
    video options:
      { type: 'youtube',   id: 'VIDEO_ID' }               plays in the pop-up
      { type: 'vimeo',     id: '123456789' }              plays in the pop-up
@@ -70,7 +70,7 @@ window.ICJ.press = [
   {
     outlet: 'Dubai One',
     logo: 'https://icodejr.com/wp-content/uploads/2026/06/dubaimedia-300x117.webp',
-    title: "Building the next generation of coders: iCodeJr's approach to STEM education",
+    title: "Building the next generation of coders: iCodejr's approach to STEM education",
     date: 'Oct 2025',
     thumb: 'https://i.ytimg.com/vi/hnHprGV0-6o/maxresdefault.jpg',
     duration: '2:01',
@@ -79,7 +79,7 @@ window.ICJ.press = [
   {
     outlet: 'Dubai Eye 103.8',
     logo: 'https://icodejr.com/wp-content/uploads/2026/06/dubaieye-300x117.webp',
-    title: 'iCodeJr on Dubai Eye radio',
+    title: 'iCodejr on Dubai Eye radio',
     date: 'Dec 2025',
     thumb: 'https://i.ytimg.com/vi/1y62SPpOy84/maxresdefault.jpg',
     duration: '11:20',
@@ -159,7 +159,7 @@ window.ICJ.faq = {
   '14-18': [
     ['Is 14+ too late to start?', 'Not at all. Older students move quickly into Python, web development, C++, Unity and AI projects, at a pace set by the skill check.', 'start'],
     ['Can this help with university applications?', 'Students build a portfolio of real projects they can show in applications, which is what our college-ready portfolio is about.', 'progress'],
-    ['Are there competitions?', 'Yes. iCodeJr has run 20+ hackathons, including Code Battle, our coding competition for students across the UAE.', 'progress'],
+    ['Are there competitions?', 'Yes. iCodejr has run 20+ hackathons, including Code Battle, our coding competition for students across the UAE.', 'progress'],
     ['How do classes fit around exams?', 'Credits never expire and you can pause anytime, so classes can fit around exam seasons.', 'cost'],
   ],
 };
@@ -172,7 +172,6 @@ window.ICJ.paths['14-18'] = window.ICJ.paths['11-13'];
 // url: replace with the exact Google profile link when available (Maps > Share > Copy link).
 window.ICJ.googleReviews = {
   rating: 4.9,
-  count: 62,
   url: 'https://www.google.com/maps/search/?api=1&query=iCodejr%2C%20Amana%20Business%20Center%2C%20Umm%20Hurrair%20Road%2C%20Dubai',
   reviews: [
     { name: 'Biswajyoti', text: 'My son has been learning coding for last 18 months. Incredibly grateful and satisfied with icodejr…' },
