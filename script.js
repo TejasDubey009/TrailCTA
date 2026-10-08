@@ -735,7 +735,7 @@ const ProjectRow = (() => {
       `${ICJ.projects.length} featured projects`,
       `Ages ${Math.min(...ages)}–${Math.max(...ages)}`,
       `Built in ${tools.join(' & ')}`,
-    ].map(t => `<li>${t}</li>`).join('');
+    ].map((t, i) => `<li class="is-${['blue', 'green', 'orange'][i]}">${t}</li>`).join('');
   }
 
   // Scroll positions where a card lines up with the left edge, ending at the far end of the row.
