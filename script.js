@@ -815,14 +815,20 @@ function renderFaq() {
   const list = $('#faq-list');
   list.dataset.age = faqAge;
   $('.faq-sec').dataset.age = faqAge;
-  list.innerHTML = groups.map(([, items, kind], g) => `<p class="faq-group ${kind}"></p>${items.map(([, , topic], i) => `
-    <details class="faq-card"${g === 0 && i === 0 ? ' open' : ''}>
-      <summary><span class="topic t-${topic}"></span><span class="q"></span><span class="faq-x" aria-hidden="true"></span></summary>
-      <p></p>
-    </details>`).join('')}`).join('');
+  // Each group collapses, which keeps the page short: the age group starts open, "For every family" starts closed.
+  list.innerHTML = groups.map(([, items, kind], g) => `
+    <details class="faq-cat ${kind}"${g === 0 ? ' open' : ''}>
+      <summary><span class="faq-group ${kind}"></span><span class="faq-count">${items.length} questions</span><span class="faq-chev" aria-hidden="true"></span></summary>
+      <div class="faq-cat-list">${items.map(([, , topic]) => `
+        <details class="faq-card">
+          <summary><span class="topic t-${topic}"></span><span class="q"></span><span class="faq-x" aria-hidden="true"></span></summary>
+          <p></p>
+        </details>`).join('')}
+      </div>
+    </details>`).join('');
   $$('.faq-group', list).forEach((el, i) => { el.textContent = groups[i][0]; });
   const all = groups.flatMap(([, items]) => items);
-  $$('details', list).forEach((d, i) => {
+  $$('.faq-card', list).forEach((d, i) => {
     $('.topic', d).textContent = ICJ.faqTopics[all[i][2]];
     $('.q', d).textContent = all[i][0];
     $('p', d).textContent = all[i][1];
@@ -851,16 +857,42 @@ $$('input[name="faq-age"]').forEach(r => r.addEventListener('change', () => setF
 /* ---------- Google rating strip ---------- */
 
 // Fixed Google score plus a slow ticker of real parent reviews (ICJ.googleReviews in data.js).
+// The booking card shows the same real reviews one at a time, in a fresh random order on every visit.
+function renderCardReviews() {
+  const box = $('#bc-reviews');
+  const list = [...ICJ.googleReviews.reviews].sort(() => Math.random() - 0.5);
+  const stars = '<svg aria-hidden="true"><use href="#i-star"/></svg>'.repeat(5);
+  box.innerHTML = list.map(() => `
+    <figure class="bc-review">
+      <span class="rs-stars" role="img" aria-label="5 out of 5 stars">${stars}</span>
+      <blockquote><q></q></blockquote>
+      <figcaption><svg class="rs-g" aria-hidden="true"><use href="#i-google"/></svg><span></span> · Google review</figcaption>
+    </figure>`).join('');
+  const items = $$('.bc-review', box);
+  items.forEach((el, i) => {
+    $('q', el).textContent = list[i].text;
+    $('figcaption span', el).textContent = list[i].name;
+  });
+  let at = 0;
+  items[0].classList.add('on');
+  if (reduceMotion || items.length < 2) return;
+  let hovered = false;
+  box.addEventListener('pointerenter', () => { hovered = true; });
+  box.addEventListener('pointerleave', () => { hovered = false; });
+  setInterval(() => {
+    if (hovered || document.hidden) return;
+    items[at].classList.remove('on');
+    at = (at + 1) % items.length;
+    items[at].classList.add('on');
+  }, 5000);
+}
+
 function renderRatingStrip() {
   const g = ICJ.googleReviews;
   const badge = $('#rs-badge');
   badge.href = g.url;
   badge.setAttribute('aria-label', `Rated ${g.rating} out of 5 on Google reviews. Opens Google.`);
   $('#rs-score').textContent = g.rating.toFixed(1);
-  // The featured review also sits in the hero booking card
-  const featured = g.reviews.find(r => r.featured) || g.reviews[0];
-  $('#bc-review-text').textContent = featured.text;
-  $('#bc-review-who').textContent = featured.name;
   const tints = ['blue', 'yellow', 'green', 'pink', 'orange'];
   const stars = '<svg aria-hidden="true"><use href="#i-star"/></svg>'.repeat(5);
   const track = $('#rs-track');
@@ -966,6 +998,7 @@ renderPress();
 renderStories();
 renderFaq();
 renderRatingStrip();
+renderCardReviews();
 syncFooterCols();
 personalize();
 ProjectRow.stats();

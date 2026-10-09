@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap">
-  <link rel="stylesheet" href="styles.css?v=48">
+  <link rel="stylesheet" href="styles.css?v=55">
 </head>
 <body>
 
@@ -36,6 +36,7 @@
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-google" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></symbol>
+    <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.6 13.8 7 22l5-2.8 5 2.8-1.6-8.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 22V3M5 4h13l-3 4.5L18 13H5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -63,9 +64,6 @@
 <header class="top" id="top">
   <nav class="nav wrap" aria-label="Main">
     <a class="logo" href="https://icodejr.com" aria-label="iCodejr home"><img src="assets/icodejr-logo.svg" alt="iCodejr" width="96" height="48"></a>
-    <a class="wa-link" href="https://wa.me/971506942633?text=Hi%20iCodejr%2C%20I%27d%20like%20to%20know%20more%20about%20the%20free%20trial%20class" target="_blank" rel="noopener">
-      <svg aria-hidden="true"><use href="#i-wa"/></svg>Connect via WhatsApp
-    </a>
   </nav>
 </header>
 
@@ -75,7 +73,7 @@
   <!-- Left: the headline with the live preview under it. Right: the booking form. -->
   <div class="wrap hero-grid">
     <div class="hero-head">
-      <p class="eyebrow"><svg aria-hidden="true"><use href="#i-shield"/></svg>UAE Ministry of Education accredited</p>
+      <p class="eyebrow"><svg aria-hidden="true"><use href="#i-shield"/></svg>Licensed and registered in the UAE</p>
       <h1 id="hero-title">In one free class, your child builds <span class="mark">something real.</span></h1>
     </div>
 
@@ -204,17 +202,14 @@
       </div>
       <!-- Bottom of the card: a real parent review and what the free class includes -->
       <div class="bc-foot">
-        <figure class="bc-review">
-          <span class="rs-stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span>
-          <blockquote><q id="bc-review-text"></q></blockquote>
-          <figcaption><svg class="rs-g" aria-hidden="true"><use href="#i-google"/></svg><span id="bc-review-who"></span> · Google review</figcaption>
-        </figure>
-      <ul class="bc-perks" aria-label="What the free class includes">
-        <li><svg aria-hidden="true"><use href="#i-clock"/></svg>50-minute live class</li>
-        <li><svg aria-hidden="true"><use href="#i-users"/></svg>1 mentor, 1 child</li>
-        <li><svg aria-hidden="true"><use href="#i-code"/></svg>Builds a real project</li>
-        <li><svg aria-hidden="true"><use href="#i-flag"/></svg>Leaves with a learning plan</li>
-      </ul>
+        <!-- Real Google reviews, shown one at a time in a random order (data: ICJ.googleReviews) -->
+        <div class="bc-reviews" id="bc-reviews" aria-label="Parent reviews from Google"></div>
+        <ul class="bc-perks" aria-label="What the free class includes">
+          <li class="is-blue"><svg aria-hidden="true"><use href="#i-clock"/></svg>50-minute live class</li>
+          <li class="is-green"><svg aria-hidden="true"><use href="#i-code"/></svg>Builds a real project</li>
+          <li class="is-orange"><svg aria-hidden="true"><use href="#i-award"/></svg>Fundamentals of STEM certificate</li>
+          <li class="is-pink"><svg aria-hidden="true"><use href="#i-flag"/></svg>Leaves with a learning plan</li>
+        </ul>
       </div>
     </div>
 
@@ -595,14 +590,14 @@
 </main>
 
 <footer class="footer">
-  <!-- The navy band behind the closing card flows into the footer through a wave; the robot and subject icons ride it -->
+  <!-- The footer's soft blue rises into the page as rolling hills; the robot and subject icons stand on them -->
   <div class="f-wave" aria-hidden="true">
-    <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none"><path fill="#0f1f3d" d="M0 0h1440v70c-60 0-120 26-240 26s-180-26-240-26-120 26-240 26-180-26-240-26-120 26-240 26S60 70 0 70z"/></svg>
-    <span class="rider r-block" style="--x:16.67%;--y:80%"><svg viewBox="0 0 64 40"><path fill="#facc15" d="M6 4h12l4 4h10l4-4h22a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H36l-4 4H22l-4-4H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/><path d="M14 16l8 4-8 4z" fill="#18a058"/></svg></span>
-    <span class="rider r-gear" style="--x:33.33%;--y:58.3%"><svg viewBox="0 0 48 48"><path fill="#ff8a3d" d="M20.5 2h7l1.2 6.1a17 17 0 0 1 4.5 1.9l5.2-3.5 4.9 4.9-3.5 5.2a17 17 0 0 1 1.9 4.5l6.1 1.2v7l-6.1 1.2a17 17 0 0 1-1.9 4.5l3.5 5.2-4.9 4.9-5.2-3.5a17 17 0 0 1-4.5 1.9L27.5 46h-7l-1.2-6.1a17 17 0 0 1-4.5-1.9l-5.2 3.5-4.9-4.9 3.5-5.2a17 17 0 0 1-1.9-4.5L0 27.5v-7l6.1-1.2a17 17 0 0 1 1.9-4.5L4.5 9.6l4.9-4.9 5.2 3.5a17 17 0 0 1 4.5-1.9z"/><circle cx="24" cy="24" r="7" fill="#0f1f3d"/></svg></span>
-    <span class="rider r-bot" style="--x:50%;--y:80%"><svg><use href="#bot"/></svg></span>
-    <span class="rider r-spark" style="--x:66.67%;--y:58.3%"><svg viewBox="0 0 48 48"><path fill="#ffbac4" d="M24 0c2 13 7 19 24 24-17 5-22 11-24 24-2-13-7-19-24-24C17 19 22 13 24 0z"/></svg></span>
-    <span class="rider r-note" style="--x:83.33%;--y:80%"><svg viewBox="0 0 40 44"><path fill="#7fd6a4" d="M13 6l25-5v30a7 6 0 1 1-5-5.6V11l-15 3v22a7 6 0 1 1-5-5.6z"/></svg></span>
+    <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0 0H1440V40C1380 40 1320 72 1200 72S1020 40 960 40 840 72 720 72 540 40 480 40 360 72 240 72 60 40 0 40Z"/></svg>
+    <span class="rider r-block" style="--x:16.67%;--y:60%"><svg viewBox="0 0 64 40"><path fill="#facc15" d="M6 4h12l4 4h10l4-4h22a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H36l-4 4H22l-4-4H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/><path d="M14 16l8 4-8 4z" fill="#18a058"/></svg></span>
+    <span class="rider r-gear" style="--x:33.33%;--y:33.3%"><svg viewBox="0 0 48 48"><path fill="#ff8a3d" d="M20.5 2h7l1.2 6.1a17 17 0 0 1 4.5 1.9l5.2-3.5 4.9 4.9-3.5 5.2a17 17 0 0 1 1.9 4.5l6.1 1.2v7l-6.1 1.2a17 17 0 0 1-1.9 4.5l3.5 5.2-4.9 4.9-5.2-3.5a17 17 0 0 1-4.5 1.9L27.5 46h-7l-1.2-6.1a17 17 0 0 1-4.5-1.9l-5.2 3.5-4.9-4.9 3.5-5.2a17 17 0 0 1-1.9-4.5L0 27.5v-7l6.1-1.2a17 17 0 0 1 1.9-4.5L4.5 9.6l4.9-4.9 5.2 3.5a17 17 0 0 1 4.5-1.9z"/><circle cx="24" cy="24" r="7" fill="#0f1f3d"/></svg></span>
+    <span class="rider r-bot" style="--x:50%;--y:60%"><svg><use href="#bot"/></svg></span>
+    <span class="rider r-spark" style="--x:66.67%;--y:33.3%"><svg viewBox="0 0 48 48"><path fill="#ffbac4" d="M24 0c2 13 7 19 24 24-17 5-22 11-24 24-2-13-7-19-24-24C17 19 22 13 24 0z"/></svg></span>
+    <span class="rider r-note" style="--x:83.33%;--y:60%"><svg viewBox="0 0 40 44"><path fill="#7fd6a4" d="M13 6l25-5v30a7 6 0 1 1-5-5.6V11l-15 3v22a7 6 0 1 1-5-5.6z"/></svg></span>
   </div>
 
   <div class="wrap">
@@ -629,7 +624,7 @@
         <img src="assets/icodejr-logo.svg" alt="iCodejr" width="112" height="56">
         <p>Live 1-on-1 coding, robotics and AI classes for kids aged 5–18. From Scratch to Python to AI.</p>
         <ul class="f-badges">
-          <li><svg aria-hidden="true"><use href="#i-shield"/></svg>UAE Ministry of Education accredited</li>
+          <li><svg aria-hidden="true"><use href="#i-shield"/></svg>Licensed and registered in the UAE</li>
           <li><svg aria-hidden="true"><use href="#i-shield"/></svg>Supported by Riyada &amp; UAE Ministry of Economy</li>
         </ul>
       </div>
@@ -699,13 +694,15 @@
   </div>
 </dialog>
 
+<a class="wa-float" href="https://wa.me/971506942633?text=Hi%20iCodejr%2C%20I%27d%20like%20to%20know%20more%20about%20the%20free%20trial%20class" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg aria-hidden="true"><use href="#i-wa"/></svg></a>
+
 <div class="dock" id="dock" aria-hidden="true">
   <p id="dock-text"><b>Free class</b> · 50 min · 1-on-1</p>
   <a class="btn btn-go" href="#book-card" data-scroll-book tabindex="-1" id="dock-btn">Book free class</a>
 </div>
 
-<script src="data.js?v=48" defer></script>
-<script src="preview.js?v=48" defer></script>
-<script src="script.js?v=48" defer></script>
+<script src="data.js?v=55" defer></script>
+<script src="preview.js?v=55" defer></script>
+<script src="script.js?v=55" defer></script>
 </body>
 </html>

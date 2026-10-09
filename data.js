@@ -89,11 +89,11 @@ window.ICJ.press = [
     outlet: 'ET Now',
     logoText: 'ET NOW',
     title: 'Leaders of Tomorrow, Season 10: Eye on Dubai education panel',
-    date: 'ET Now · Times Network',
-    thumb: '',
-    duration: '',
-    // timesnownews.com does not allow its player to be embedded, so this opens their page.
-    video: { type: 'link', url: 'https://www.timesnownews.com/videos/et-now/shows/leaders-of-tomorrow-season-10-eye-on-dubai-education-panel-video-90611802' },
+    date: 'Apr 2022',
+    // ET Now's own YouTube upload. The thumbnail is a frame with Hannan and the iCodejr caption on screen.
+    thumb: 'https://i.ytimg.com/vi/yq1VXGUuTYs/hq3.jpg',
+    duration: '21:51',
+    video: { type: 'youtube', id: 'yq1VXGUuTYs' },
   },
 ];
 
@@ -168,14 +168,17 @@ window.ICJ.faq = {
 window.ICJ.paths['14-18'] = window.ICJ.paths['11-13'];
 
 // Google rating strip (between the FAQ and the closer). Real reviews from the iCodejr Google Business profile,
-// in the parents' own words; "…" marks where a longer review was shortened. Add more the same way.
-// url: replace with the exact Google profile link when available (Maps > Share > Copy link).
+// in the parents' own words; "…" marks where a longer review was shortened. Add more the same way;
+// the hero booking card rotates through all of them in a random order.
 window.ICJ.googleReviews = {
   rating: 4.9,
-  url: 'https://www.google.com/maps/search/?api=1&query=iCodejr%2C%20Amana%20Business%20Center%2C%20Umm%20Hurrair%20Road%2C%20Dubai',
+  url: 'https://maps.google.com/?cid=1559053543571971511', // the iCodejr listing on Google Maps
   reviews: [
+    { name: 'Mary B.', text: '… the lessons include engaging projects and clear explanations—my son looked forward to every coding assignment and learned a lot.' },
     { name: 'Biswajyoti', text: 'My son has been learning coding for last 18 months. Incredibly grateful and satisfied with icodejr…' },
-    { name: 'Mary A.', text: 'Really professional and great with kids! … my son loved his lessons.', featured: true }, // also shown in the hero booking card
+    { name: 'Irfan B.', text: 'My son absolutely loved the guys at iCodeJR when we visited the activateme festival. …' },
+    { name: 'Suchit P.', text: 'iCodejr is a fantastic platform for young minds to dive into the world of coding and robotics! …' },
+    { name: 'Mary A.', text: 'Really professional and great with kids! … my son loved his lessons.' },
     { name: 'Mubeen M.', text: 'iCodeJr is an ideal destination for parents looking for a coding school for their young children. …' },
     { name: 'Abhishek M.', text: 'Great Initiative for Growing Kids to know about the Robotics with fun. …' },
   ],
